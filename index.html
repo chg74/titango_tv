@@ -52,12 +52,18 @@ body{background:
 @keyframes actIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 .activation-title{color:#fff;font-size:26px;font-weight:900;margin-bottom:22px}
 .activation-sub{color:#8b9bc4;font-size:14px;line-height:1.9;font-weight:600;margin-bottom:2px}
-.activation-input{width:100%;padding:16px;background:#0f1424;border:1.5px solid rgba(100,120,180,.2);border-radius:14px;color:#fff;font-size:18px;text-align:center;letter-spacing:6px;font-family:'Cairo',sans-serif;margin:22px 0 16px;outline:none;transition:.2s;font-weight:700}
+.activation-input{width:100%;padding:16px;background:#0f1424;border:1.5px solid rgba(100,120,180,.2);border-radius:14px;color:#fff;font-size:18px;text-align:center;letter-spacing:6px;font-family:'Cairo',sans-serif;margin:22px 0 14px;outline:none;transition:.2s;font-weight:700}
 .activation-input::placeholder{color:#4a5a7a;letter-spacing:4px;font-weight:600}
 .activation-input:focus{border-color:#fbbf24;box-shadow:0 0 0 4px rgba(251,191,36,.1)}
-.activation-btn{width:100%;padding:16px;border:0;border-radius:14px;font-size:16px;font-weight:900;font-family:'Cairo',sans-serif;cursor:pointer;margin-bottom:12px;display:block;text-align:center;text-decoration:none;transition:.15s}
+.activation-error{display:none;color:#f87171;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;margin:0 0 14px;text-align:center;animation:errShake .35s ease;line-height:1.6}
+@keyframes errShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.activation-btn{width:100%;padding:16px;border:0;border-radius:14px;font-size:16px;font-weight:900;font-family:'Cairo',sans-serif;cursor:pointer;margin-bottom:12px;display:block;text-align:center;text-decoration:none;transition:.15s;position:relative;overflow:hidden}
 .activation-btn:active{transform:scale(.98)}
 .activation-btn.activate{background:linear-gradient(180deg,#fcd34d,#fbbf24);color:#1a1408;box-shadow:0 10px 26px rgba(251,191,36,.3)}
+.activation-btn.activate:disabled{opacity:.6;cursor:not-allowed}
+.activation-btn.activate.loading{color:transparent}
+.activation-btn.activate.loading::after{content:'';position:absolute;top:50%;left:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2.5px solid rgba(26,20,8,.25);border-top-color:#1a1408;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .activation-btn.telegram{background:linear-gradient(180deg,#38bdf8,#0ea5e9);color:#fff;box-shadow:0 10px 26px rgba(14,165,233,.3);margin-bottom:0}
 
 /* ═══ VPN / LOCK SCREENS ═══ */
@@ -147,7 +153,6 @@ body{background:
 
 .loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 20px;gap:16px;color:var(--text-dim);font-size:12.5px;font-weight:700}
 .spinner{width:52px;height:52px;border-radius:50%;border:3px solid rgba(124,58,237,.1);border-top-color:var(--p2);border-right-color:var(--c2);animation:spin 1s linear infinite;box-shadow:0 0 24px var(--glow)}
-@keyframes spin{to{transform:rotate(360deg)}}
 
 .back-row{margin:0 4px 12px}
 .back-cat-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(6,182,212,.08));color:#fff;padding:9px 18px;border-radius:100px;border:1px solid var(--border);font-weight:800;font-size:12.5px;cursor:pointer;font-family:'Cairo',sans-serif;transition:.2s}
@@ -228,7 +233,8 @@ body{background:
 <p class="activation-sub">أدخل كود التفعيل للمتابعة.</p>
 <p class="activation-sub">للحصول على الكود انضم إلى قناة التليجرام.</p>
 <input type="text" class="activation-input" id="activationInput" placeholder="XXXX" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-<button class="activation-btn activate" onclick="submitActivation()">تفعيل</button>
+<div class="activation-error" id="activationError"></div>
+<button class="activation-btn activate" id="activateBtn" onclick="submitActivation()">تفعيل</button>
 <a class="activation-btn telegram" href="https://t.me/titango_tv" target="_blank" rel="noopener">انضمام للقناة للحصول على الكود</a>
 </div>
 </div>
@@ -605,7 +611,7 @@ showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 2500);
 window.showToast = showToast;
 
 /* ═══════════════════════════════════════
-   🔐 ACTIVATION SYSTEM
+   🔐 ACTIVATION SYSTEM (FIXED)
 ═══════════════════════════════════════ */
 var ACTIVATION_KEY = 'titango_activation_code';
 var currentAppCode = '';
@@ -617,15 +623,34 @@ function getSavedCode(){
 function setSavedCode(v){
   try{ localStorage.setItem(ACTIVATION_KEY, v); }catch(e){}
 }
+function clearSavedCode(){
+  try{ localStorage.removeItem(ACTIVATION_KEY); }catch(e){}
+}
 
-function showActivationScreen(){
+function showActivationScreen(errorMsg){
   var s = document.getElementById('activationScreen');
   if(s) s.classList.add('show');
-  var a = document.getElementById('app'); if(a){ a.style.display = 'none'; a.classList.remove('show'); }
-  var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';
-  var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';
+
+  var a = document.getElementById('app');
+  if(a){ a.style.display = 'none'; a.classList.remove('show'); }
+
+  var sp = document.getElementById('splash');
+  if(sp) sp.style.display = 'none';
+
+  var bn = document.getElementById('bottomNav');
+  if(bn) bn.style.display = 'none';
+
   var inp = document.getElementById('activationInput');
-  if(inp){ inp.value = ''; try{ setTimeout(function(){ inp.focus(); }, 150); }catch(e){} }
+  if(inp){
+    inp.value = '';
+    inp.disabled = false;
+    try{ setTimeout(function(){ inp.focus(); }, 200); }catch(e){}
+  }
+
+  var btn = document.getElementById('activateBtn');
+  if(btn){ btn.disabled = false; btn.classList.remove('loading'); }
+
+  setActivationError(errorMsg || '');
 }
 
 function hideActivationScreen(){
@@ -633,122 +658,187 @@ function hideActivationScreen(){
   if(s) s.classList.remove('show');
 }
 
-function startApp(){
+function enterAppClean(){
   hideActivationScreen();
-  if(!appStarted){
-    splash.classList.add('hide');
-    enterApp();
+  var sp = document.getElementById('splash');
+  if(sp) sp.classList.add('hide');
+  var a = document.getElementById('app');
+  if(a){ a.style.display = 'block'; a.style.opacity = '0'; a.classList.add('show'); }
+  var bn = document.getElementById('bottomNav');
+  if(bn) bn.style.display = 'flex';
+  appStarted = true;
+  try{ setTimeout(function(){ if(a) a.style.opacity = '1'; }, 30); }catch(e){}
+}
+
+function setActivationError(msg){
+  var el = document.getElementById('activationError');
+  if(!el) return;
+  if(msg){
+    el.textContent = msg;
+    el.style.display = 'block';
   } else {
-    // Already started - just re-show
-    var a = document.getElementById('app');
-    if(a){ a.style.display = 'block'; a.classList.add('show'); }
-    var bn = document.getElementById('bottomNav');
-    if(bn) bn.style.display = 'flex';
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+}
+
+function setActivationLoading(on){
+  var btn = document.getElementById('activateBtn');
+  if(!btn) return;
+  if(on){
+    btn.disabled = true;
+    btn.classList.add('loading');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('loading');
   }
 }
 
 function startAppFlow(){
-  fdb.ref('app_code').once('value').then(function(snap){
-    currentAppCode = String(snap.val() || '').trim();
-    var saved = getSavedCode();
-    if(!currentAppCode){
-      // No code set - allow access
-      splash.classList.add('hide');
-      enterApp();
-    } else if(saved === currentAppCode){
-      splash.classList.add('hide');
-      enterApp();
-    } else {
-      showActivationScreen();
-    }
+  var resolved = false;
+  var timeout = setTimeout(function(){
+    if(resolved) return;
+    resolved = true;
+    currentAppCode = '';
+    enterAppClean();
     initActivationWatcher();
-  }).catch(function(){
-    // Firebase error - use saved if available
-    var saved = getSavedCode();
-    if(saved){
-      splash.classList.add('hide');
-      enterApp();
-    } else {
-      showActivationScreen();
-    }
+  }, 5000);
+
+  try{
+    fdb.ref('app_code').once('value').then(function(snap){
+      if(resolved) return;
+      resolved = true;
+      clearTimeout(timeout);
+      currentAppCode = String(snap.val() == null ? '' : snap.val()).trim();
+      applyCodeState();
+      initActivationWatcher();
+    }).catch(function(){
+      if(resolved) return;
+      resolved = true;
+      clearTimeout(timeout);
+      currentAppCode = '';
+      enterAppClean();
+      initActivationWatcher();
+    });
+  }catch(e){
+    if(resolved) return;
+    resolved = true;
+    clearTimeout(timeout);
+    currentAppCode = '';
+    enterAppClean();
     initActivationWatcher();
-  });
+  }
+}
+
+function applyCodeState(){
+  if(!currentAppCode){
+    enterAppClean();
+    return;
+  }
+  var saved = getSavedCode();
+  if(saved && saved === currentAppCode){
+    enterAppClean();
+  } else {
+    showActivationScreen();
+  }
 }
 
 function submitActivation(){
   var inp = document.getElementById('activationInput');
+  if(!inp) return;
   var val = (inp.value || '').trim();
-  if(!val){ showToast('من فضلك أدخل الكود', 'error'); return; }
-  if(!currentAppCode){
-    // refetch in case
-    fdb.ref('app_code').once('value').then(function(snap){
-      currentAppCode = String(snap.val() || '').trim();
-      doActivation(val);
-    }).catch(function(){ doActivation(val); });
-    return;
-  }
-  doActivation(val);
-}
 
-function doActivation(val){
-  if(!currentAppCode){
-    showToast('لا يوجد كود مفعّل حالياً', 'error');
+  if(!val){
+    setActivationError('من فضلك أدخل كود التفعيل');
     return;
   }
-  if(val === currentAppCode){
-    setSavedCode(val);
-    showToast('تم التفعيل بنجاح ✅', 'success');
-    setTimeout(function(){ try{ location.reload(); }catch(e){} }, 700);
-  } else {
-    showToast('كود غير صحيح ❌', 'error');
-    var inp = document.getElementById('activationInput');
-    if(inp) inp.value = '';
+
+  setActivationError('');
+  setActivationLoading(true);
+
+  var verify = function(code){
+    setActivationLoading(false);
+    if(!code){
+      currentAppCode = '';
+      enterAppClean();
+      showToast('تم فتح التطبيق — الكود اتشال', 'success');
+      return;
+    }
+    if(val === code){
+      setSavedCode(val);
+      currentAppCode = code;
+      if(inp) inp.value = '';
+      showToast('تم التفعيل بنجاح ✅', 'success');
+      setTimeout(function(){ enterAppClean(); }, 400);
+    } else {
+      setActivationError('❌ كود غير صحيح — تأكد من الكود وحاول تاني');
+      try{ inp.value = ''; inp.focus(); }catch(e){}
+    }
+  };
+
+  try{
+    fdb.ref('app_code').once('value').then(function(snap){
+      var code = String(snap.val() == null ? '' : snap.val()).trim();
+      currentAppCode = code;
+      verify(code);
+    }).catch(function(){
+      verify(currentAppCode);
+    });
+  }catch(e){
+    verify(currentAppCode);
   }
 }
 
 function initActivationWatcher(){
   if(activationWatcherStarted) return;
   activationWatcherStarted = true;
-  fdb.ref('app_code').on('value', function(snap){
-    var code = String(snap.val() || '').trim();
-    if(code === currentAppCode) return;
-    var wasSet = !!currentAppCode;
-    currentAppCode = code;
-    var saved = getSavedCode();
 
-    if(!code){
-      // Code removed - allow all
-      if(!appStarted){ splash.classList.add('hide'); enterApp(); }
-      else { hideActivationScreen(); }
-      return;
-    }
-    if(saved !== code){
-      // Code changed or new - kick out
-      showActivationScreen();
-    }
-  });
+  try{
+    fdb.ref('app_code').on('value', function(snap){
+      var code = String(snap.val() == null ? '' : snap.val()).trim();
+      var oldCode = currentAppCode;
+      currentAppCode = code;
+
+      if(!code){
+        clearSavedCode();
+        enterAppClean();
+        showToast('تم فتح التطبيق للجميع', 'success');
+        return;
+      }
+
+      var saved = getSavedCode();
+      if(saved !== code){
+        showActivationScreen(
+          oldCode && oldCode !== code
+            ? '⚠️ تم تغيير كود التفعيل — أدخل الكود الجديد'
+            : ''
+        );
+      } else {
+        hideActivationScreen();
+        enterAppClean();
+      }
+    }, function(){});
+  }catch(e){}
 }
 
 window.submitActivation = submitActivation;
 
-// Attach Enter key to activation input
 (function(){
   var inp = document.getElementById('activationInput');
   if(inp){
     inp.addEventListener('keydown', function(e){
-      if(e.key === 'Enter' || e.keyCode === 13){ e.preventDefault(); submitActivation(); }
+      if(e.key === 'Enter' || e.keyCode === 13){
+        e.preventDefault();
+        submitActivation();
+      }
+    });
+    inp.addEventListener('input', function(){
+      setActivationError('');
     });
   }
 })();
 
-setTimeout(function(){ startAppFlow(); }, 2000);
-
-function enterApp(){
-if(appStarted) return;
-appStarted = true;
-app.classList.add('show');
-bottomNav.style.display = 'flex';
-}
+setTimeout(function(){ startAppFlow(); }, 2500);
 
 /* ═══ DRAWER ═══ */
 function openDrawer(){
