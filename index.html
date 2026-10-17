@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
 <style>
 *{box-sizing:border-box;font-family:'Cairo',sans-serif;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 :root{
@@ -165,21 +166,36 @@ body{background:
 .toast.error{background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 8px 28px rgba(239,68,68,.5)}
 .toast.success{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 28px rgba(16,185,129,.5)}
 
-.player-download-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.94);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:20px}
-.player-download-modal.show{display:flex;animation:fadeInModal .3s}
-@keyframes fadeInModal{from{opacity:0}to{opacity:1}}
-.pdm-panel{width:100%;max-width:420px;background:linear-gradient(180deg,#140d24,#0a0714);border-radius:26px;border:1px solid var(--border);padding:28px 22px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:popIn .35s cubic-bezier(.16,1,.3,1)}
-@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
-.pdm-icon{width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 12px 40px rgba(124,58,237,.4)}
-.pdm-icon svg{width:44px;height:44px;fill:#fff}
-.pdm-title{color:#fff;font-size:20px;font-weight:900;margin-bottom:8px}
-.pdm-sub{color:var(--text-dim);font-size:13.5px;line-height:1.9;font-weight:600;margin-bottom:20px}
-.pdm-sub b{color:#a855f7}
-.pdm-btn{width:100%;padding:18px 18px;border:0;border-radius:14px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:.15s;color:#fff;text-decoration:none;margin-bottom:10px}
-.pdm-btn:active{transform:scale(.97)}
-.pdm-btn.arix{background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 10px 30px rgba(124,58,237,.4)}
-.pdm-btn.close{background:transparent;color:var(--text-dim);border:1px solid var(--border);font-size:13px;padding:12px;margin-top:6px}
-.pdm-note{color:#7a6a9a;font-size:11px;text-align:center;margin-top:14px;line-height:1.7;font-weight:600}
+/* ═══ VIDEO PLAYER OVERLAY ═══ */
+.video-player-overlay{position:fixed;inset:0;z-index:2147483645;background:#000;display:none;flex-direction:column;overflow:hidden}
+.video-player-overlay.show{display:flex}
+.video-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#000}
+.video-stage video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
+.video-top-bar{position:absolute;top:0;left:0;right:0;z-index:20;padding:calc(var(--safe-top) + 10px) 14px 30px;background:linear-gradient(180deg,rgba(0,0,0,.85),rgba(0,0,0,.4) 60%,transparent);display:flex;align-items:center;gap:12px;transition:opacity .3s,transform .3s}
+.video-top-bar.hide{opacity:0;transform:translateY(-10px);pointer-events:none}
+.vp-close-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;backdrop-filter:blur(10px);transition:.2s}
+.vp-close-btn:active{transform:scale(.92);background:rgba(239,68,68,.4)}
+.vp-close-btn svg{width:20px;height:20px;fill:#fff}
+.vp-channel-info{flex:1;min-width:0;text-align:right;padding-inline-end:4px}
+.vp-channel-name{color:#fff;font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+.vp-channel-live{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font-size:10.5px;font-weight:700;color:#ef4444}
+.vp-channel-live::before{content:'';width:7px;height:7px;border-radius:50%;background:#ef4444;box-shadow:0 0 10px #ef4444;animation:liveBlink 1.2s infinite}
+@keyframes liveBlink{50%{opacity:.4}}
+.vp-fullscreen-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;backdrop-filter:blur(10px);transition:.2s}
+.vp-fullscreen-btn:active{transform:scale(.92);background:rgba(124,58,237,.5)}
+.vp-fullscreen-btn svg{width:20px;height:20px;fill:#fff}
+.vp-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(0,0,0,.7);z-index:15;backdrop-filter:blur(4px)}
+.vp-loading .spinner{width:60px;height:60px;border-width:3.5px}
+.vp-loading-text{color:#e0d5ff;font-size:13px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+.vp-error{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(0,0,0,.92);padding:30px;text-align:center;z-index:18}
+.vp-error.show{display:flex}
+.vp-error-icon{width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,#ef4444,#b91c1c);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(239,68,68,.5)}
+.vp-error-icon svg{width:44px;height:44px;fill:#fff}
+.vp-error-title{color:#fff;font-size:18px;font-weight:900}
+.vp-error-text{color:#c8b8e0;font-size:13px;line-height:1.8;font-weight:600;max-width:340px}
+.vp-error-btn{background:linear-gradient(135deg,var(--p1),var(--c1));color:#fff;border:none;padding:13px 32px;border-radius:100px;font-size:14px;font-weight:900;font-family:'Cairo',sans-serif;cursor:pointer;box-shadow:0 8px 24px var(--glow);margin-top:6px;transition:.2s}
+.vp-error-btn:active{transform:scale(.96)}
+.vp-center-tap{position:absolute;inset:0;z-index:12;cursor:pointer;background:transparent}
 
 @media (min-width: 768px){.grid-cards{grid-template-columns:repeat(4,1fr);gap:16px}.app-content,.app-topbar-inner{max-width:1000px}.app-bottomnav{max-width:1000px;margin:0 auto;border-radius:20px 20px 0 0;border-left:1px solid var(--border);border-right:1px solid var(--border)}.card .card-logo{width:72px;height:72px}.card .card-name{font-size:13px}}
 @media (min-width: 1024px){.grid-cards{grid-template-columns:repeat(5,1fr);gap:20px}.app-content,.app-topbar-inner,.app-bottomnav{max-width:1300px}.card{min-height:155px;padding:20px 10px 15px}.card .card-logo{width:88px;height:88px}.card .card-name{font-size:14px}}
@@ -292,18 +308,37 @@ body{background:
 <div class="drawer-footer">TITANGO TV © 2025<br>جميع الحقوق محفوظة</div>
 </div>
 
-<!-- DOWNLOAD MODAL (Arix Player) -->
-<div class="player-download-modal" id="playerDownloadModal">
-<div class="pdm-panel">
-<div class="pdm-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-<div class="pdm-title">محتاج تحمّل Arix Player</div>
-<div class="pdm-sub">عشان تشغّل القنوات لازم تحمّل مشغل <b>Arix Player</b><br>بعد التحميل ارجع للتطبيق واضغط القناة تاني</div>
-<a href="https://play.google.com/store/apps/details?id=com.arix.player" target="_blank" class="pdm-btn arix">
-<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-تحميل Arix Player من Google Play
-</a>
-<button class="pdm-btn close" onclick="closeDownloadModal()">✕ إغلاق</button>
-<div class="pdm-note">💡 Arix Player مشغل خفيف وسريع يدعم m3u8 و ts و m3u</div>
+<!-- ═══ IN-APP VIDEO PLAYER ═══ -->
+<div class="video-player-overlay" id="videoPlayerOverlay">
+<div class="video-stage">
+<video id="mainVideo" playsinline preload="auto"></video>
+
+<div class="video-top-bar" id="videoTopBar">
+<button class="vp-close-btn" onclick="closeVideoPlayer()" aria-label="close">
+<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+</button>
+<div class="vp-channel-info">
+<div class="vp-channel-name" id="vpChannelName">القناة</div>
+<div class="vp-channel-live">مباشر</div>
+</div>
+<button class="vp-fullscreen-btn" onclick="toggleFullscreen()" aria-label="fullscreen">
+<svg id="vpFullscreenIcon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+</button>
+</div>
+
+<div class="vp-center-tap" id="vpCenterTap"></div>
+
+<div class="vp-loading" id="vpLoading">
+<div class="spinner"></div>
+<div class="vp-loading-text">جاري تحميل القناة...</div>
+</div>
+
+<div class="vp-error" id="vpError">
+<div class="vp-error-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+<div class="vp-error-title">القناة مش شغالة دلوقتي</div>
+<div class="vp-error-text">حاول تاني أو اختر قناة تانية</div>
+<button class="vp-error-btn" onclick="retryPlay()">🔄 حاول تاني</button>
+</div>
 </div>
 </div>
 
@@ -327,6 +362,7 @@ if(s) s.classList.add('show');
 var a = document.getElementById('app'); if(a) a.style.display = 'none';
 var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';
 var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';
+var vp = document.getElementById('videoPlayerOverlay'); if(vp) vp.classList.remove('show');
 window.categoriesData = [];
 if(window.fdb){
 try{ if(window.categoriesRef) window.categoriesRef.off(); }catch(e){}
@@ -346,7 +382,7 @@ function fetchAllIPs(){var sources = ['https://api.ipify.org?format=text','https
 function getWebRTCIPs(){return new Promise(function(resolve){var ips = {};var done = false;var pc;try{ pc = new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}); }catch(e){ return resolve([]); }function finish(){ if(done) return; done = true; try{ pc.close(); }catch(e){} resolve(Object.keys(ips)); }pc.onicecandidate = function(ice){if(!ice || !ice.candidate){ finish(); return; }var c = ice.candidate.candidate || '';var m = /([0-9]{1,3}(?:\.[0-9]{1,3}){3})/.exec(c);if(m){var ip = m[1];var parts = ip.split('.').map(Number);if(parts[0] === 0 || parts[0] === 127) return;if(parts[0] === 10) return;if(parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return;if(parts[0] === 192 && parts[1] === 168) return;if(parts[0] === 169 && parts[1] === 254) return;if(parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) return;ips[ip] = true;}};try{ pc.createDataChannel('x'); pc.createOffer().then(function(o){ return pc.setLocalDescription(o); }).catch(function(){ finish(); }); }catch(e){ finish(); }setTimeout(finish, 3500);});}
 function parseTrace(text){var r = { ip:null, loc:null, warp:null };if(!text) return r;text.split('\n').forEach(function(line){var i = line.indexOf('=');if(i === -1) return;var k = line.substring(0,i).trim();var v = line.substring(i+1).trim();if(k === 'ip') r.ip = v;if(k === 'loc') r.loc = v;if(k === 'warp') r.warp = v;});return r;}
 function detectVPN(){return Promise.all([fetchAllIPs(), getWebRTCIPs()]).then(function(res){var httpResults = res[0] || [];var rtcIPs = res[1] || [];var strongSignals = 0;var weakSignals = 0;for(var i=0;i<httpResults.length;i++){var r = httpResults[i];if(r.url.indexOf('cloudflare.com/cdn-cgi') !== -1 || r.url.indexOf('1.1.1.1/cdn-cgi') !== -1 || r.url.indexOf('one.one.one.one/cdn-cgi') !== -1){var tr = parseTrace(r.text);if(tr.warp === 'on' || tr.warp === 'plus'){ strongSignals++; }}}for(var m=0;m<httpResults.length;m++){var txt = (httpResults[m].text || '').toLowerCase();var orgMatch = /"org"\s*:\s*"([^"]+)"/i.exec(txt);var ispMatch = /"isp"\s*:\s*"([^"]+)"/i.exec(txt);if(orgMatch && checkKeyword(orgMatch[1])){ strongSignals++; }if(ispMatch && checkKeyword(ispMatch[1])){ strongSignals++; }}var uniqueHttpIPs = [];for(var j=0;j<httpResults.length;j++){var ip = httpResults[j].ip;if(uniqueHttpIPs.indexOf(ip) === -1) uniqueHttpIPs.push(ip);}if(uniqueHttpIPs.length >= 3){ weakSignals++; }if(uniqueHttpIPs.length > 0 && rtcIPs.length > 0){var found = false;for(var k=0;k<rtcIPs.length;k++){ if(uniqueHttpIPs.indexOf(rtcIPs[k]) !== -1){ found = true; break; } }if(!found){ weakSignals++; }}if(rtcIPs.length > 1){ weakSignals++; }var isVpn = false;if(strongSignals >= 1) isVpn = true;else if(weakSignals >= 2) isVpn = true;return { isVpn: isVpn };}).catch(function(e){ return { isVpn: false }; });}
-function showVpnBlock(){if(vpnLocked) return;vpnLocked = true;try{var s = document.getElementById('vpnBlockScreen');if(s) s.classList.add('show');var a = document.getElementById('app'); if(a) a.style.display = 'none';var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';var dm = document.getElementById('playerDownloadModal'); if(dm) dm.classList.remove('show');window.categoriesData = [];if(window.fdb){try{ if(window.categoriesRef) window.categoriesRef.off(); }catch(e){}try{ if(window.viewerRef) window.viewerRef.off(); }catch(e){}try{ window.fdb.goOffline(); }catch(e){}}if(window.heartbeatInterval) clearInterval(window.heartbeatInterval);}catch(e){}}
+function showVpnBlock(){if(vpnLocked) return;vpnLocked = true;try{var s = document.getElementById('vpnBlockScreen');if(s) s.classList.add('show');var a = document.getElementById('app'); if(a) a.style.display = 'none';var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';var vp = document.getElementById('videoPlayerOverlay'); if(vp) vp.classList.remove('show');try{ window.closeVideoPlayer && window.closeVideoPlayer(); }catch(e){}window.categoriesData = [];if(window.fdb){try{ if(window.categoriesRef) window.categoriesRef.off(); }catch(e){}try{ if(window.viewerRef) window.viewerRef.off(); }catch(e){}try{ window.fdb.goOffline(); }catch(e){}}if(window.heartbeatInterval) clearInterval(window.heartbeatInterval);}catch(e){}}
 function hideVpnBlock(){if(!vpnLocked) return;vpnLocked = false;try{var s = document.getElementById('vpnBlockScreen');if(s) s.classList.remove('show');}catch(e){}}
 function vpnWatchLoop(){detectVPN().then(function(info){if(info.isVpn){showVpnBlock();if(sessionStorage.getItem('wasWatching') === '1'){sessionStorage.removeItem('wasWatching');try{ setTimeout(function(){ try{ window.location.reload(); }catch(e){} }, 1500); }catch(e){}}} else { hideVpnBlock(); }});}
 setTimeout(vpnWatchLoop, 1200);
@@ -385,13 +421,12 @@ var catsGrid = $('catsGrid'), channelsGrid = $('channelsGrid');
 var viewCategories = $('viewCategories'), viewChannels = $('viewChannels');
 var viewLive = $('viewLive'), liveList = $('liveList'), liveCount = $('liveCount');
 var catTitle = $('catTitle'), toast = $('toast');
-var bottomNav = $('bottomNav'), downloadModal = $('playerDownloadModal');
+var bottomNav = $('bottomNav');
 var drawer = $('drawer'), drawerOverlay = $('drawerOverlay');
 var categoriesData = [];
 window.categoriesData = categoriesData;
 var currentCatIndex = -1;
 var appStarted = false;
-var pendingPlayerUrl = '';
 
 function showToast(msg, type){toast.textContent = msg;toast.classList.remove('error','success');if(type) toast.classList.add(type);toast.classList.add('show');clearTimeout(showToast._t);showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 2500);}
 window.showToast = showToast;
@@ -443,49 +478,236 @@ function openChannel(chi){var cat = categoriesData[currentCatIndex];if(!cat) ret
 function openLiveChannel(ci, chi){var cat = categoriesData[ci];if(!cat) return;handleChannelClick(cat.channels[chi]);}
 
 /* ═══════════════════════════════════════
-   🎬 PLAYER SYSTEM — Arix Player Only
+   🎬 IN-APP VIDEO PLAYER (HLS.js)
+   لا يظهر رابط البث نهائياً
 ═══════════════════════════════════════ */
-var PKG_ARIX = 'com.arix.player';
+var playerOverlay = document.getElementById('videoPlayerOverlay');
+var mainVideo = document.getElementById('mainVideo');
+var vpLoading = document.getElementById('vpLoading');
+var vpError = document.getElementById('vpError');
+var vpChannelName = document.getElementById('vpChannelName');
+var videoTopBar = document.getElementById('videoTopBar');
+var vpCenterTap = document.getElementById('vpCenterTap');
+var currentHls = null;
+var currentUrl = '';
+var currentChannelName = '';
+var controlsTimer = null;
+var isFullscreen = false;
 
 function handleChannelClick(ch){
 if(!ch) return;
 if(!ch.live){ showToast('القناة غير متاحة حالياً'); return; }
 if(!ch.url){ showToast('لا يوجد رابط للبث'); return; }
-pendingPlayerUrl = ch.url;
-showToast('جاري فتح Arix Player...', 'success');
-launchArix();
+openVideoPlayer(ch.url, ch.name || 'قناة');
 }
 
-function launchArix(){
-var url = pendingPlayerUrl;
-if(!url) return;
-var isHttps = url.toLowerCase().startsWith("https");
-var scheme = isHttps ? "https" : "http";
-var urlNoProto = url.replace(/^https?:\/\//i, "");
-var intentUrl = "intent://" + urlNoProto + "#Intent;scheme=" + scheme + ";type=video/*;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=" + PKG_ARIX + ";end";
-var opened = false;
-var mark = function(){ opened = true; };
-document.addEventListener("visibilitychange", mark, { once: true });
-window.addEventListener("pagehide", mark, { once: true });
-window.addEventListener("blur", mark, { once: true });
-try{ window.location.href = intentUrl; }catch(e){}
-setTimeout(function(){
-  if(!opened && !document.hidden && document.visibilityState === "visible"){
-    showDownloadModal();
-  }
-}, 2200);
-}
+function openVideoPlayer(url, name){
+currentUrl = url;
+currentChannelName = name;
+vpChannelName.textContent = name;
 
-function showDownloadModal(){
-downloadModal.classList.add('show');
+// عرض الشاشة
+playerOverlay.classList.add('show');
 document.body.style.overflow = 'hidden';
+
+// إخفاء القوائم
+vpLoading.style.display = 'flex';
+vpError.classList.remove('show');
+
+// منع قفل الشاشة
+try{
+  if('wakeLock' in navigator){
+    navigator.wakeLock.request('screen').catch(function(){});
+  }
+}catch(e){}
+
+loadStream(url);
+scheduleHideControls();
 }
-function closeDownloadModal(){
-downloadModal.classList.remove('show');
+
+function loadStream(url){
+destroyHls();
+
+if(!url){
+  showPlayerError();
+  return;
+}
+
+var isM3U8 = /\.m3u8(\?|$)/i.test(url) || /m3u8/i.test(url);
+
+vpLoading.style.display = 'flex';
+vpError.classList.remove('show');
+
+if(isM3U8 && window.Hls && Hls.isSupported()){
+  currentHls = new Hls({
+    enableWorker: true,
+    lowLatencyMode: true,
+    backBufferLength: 30,
+    maxBufferLength: 30,
+    maxMaxBufferLength: 60
+  });
+  currentHls.loadSource(url);
+  currentHls.attachMedia(mainVideo);
+
+  currentHls.on(Hls.Events.MANIFEST_PARSED, function(){
+    vpLoading.style.display = 'none';
+    mainVideo.play().catch(function(){
+      // بعض المتصفحات تحتاج تفاعل المستخدم
+      mainVideo.muted = true;
+      mainVideo.play().then(function(){ mainVideo.muted = false; }).catch(function(){});
+    });
+  });
+
+  currentHls.on(Hls.Events.ERROR, function(event, data){
+    if(data && data.fatal){
+      switch(data.type){
+        case Hls.ErrorTypes.NETWORK_ERROR:
+          try{ currentHls.startLoad(); }catch(e){ showPlayerError(); }
+          break;
+        case Hls.ErrorTypes.MEDIA_ERROR:
+          try{ currentHls.recoverMediaError(); }catch(e){ showPlayerError(); }
+          break;
+        default:
+          showPlayerError();
+          break;
+      }
+    }
+  });
+
+  setTimeout(function(){
+    if(vpLoading.style.display !== 'none' && !mainVideo.videoWidth){
+      // شغل احتياطي بعد 12 ثانية
+    }
+  }, 12000);
+
+} else if(isM3U8 && mainVideo.canPlayType('application/vnd.apple.mpegurl')){
+  // iOS native HLS
+  mainVideo.src = url;
+  mainVideo.addEventListener('loadedmetadata', function onMeta(){
+    mainVideo.removeEventListener('loadedmetadata', onMeta);
+    vpLoading.style.display = 'none';
+    mainVideo.play().catch(function(){});
+  }, { once: true });
+  mainVideo.addEventListener('error', function onErr(){
+    mainVideo.removeEventListener('error', onErr);
+    showPlayerError();
+  }, { once: true });
+
+} else {
+  // MP4 أو TS مباشر
+  mainVideo.src = url;
+  mainVideo.addEventListener('loadedmetadata', function onMeta(){
+    mainVideo.removeEventListener('loadedmetadata', onMeta);
+    vpLoading.style.display = 'none';
+    mainVideo.play().catch(function(){
+      mainVideo.muted = true;
+      mainVideo.play().then(function(){ mainVideo.muted = false; }).catch(function(){});
+    });
+  }, { once: true });
+  mainVideo.addEventListener('error', function onErr(){
+    mainVideo.removeEventListener('error', onErr);
+    showPlayerError();
+  }, { once: true });
+}
+
+mainVideo.addEventListener('waiting', function(){ vpLoading.style.display = 'flex'; }, { once: false });
+mainVideo.addEventListener('playing', function(){ vpLoading.style.display = 'none'; }, { once: false });
+mainVideo.addEventListener('canplay', function(){ vpLoading.style.display = 'none'; }, { once: false });
+}
+
+function showPlayerError(){
+vpLoading.style.display = 'none';
+vpError.classList.add('show');
+}
+
+function destroyHls(){
+if(currentHls){
+  try{ currentHls.destroy(); }catch(e){}
+  currentHls = null;
+}
+try{
+  mainVideo.pause();
+  mainVideo.removeAttribute('src');
+  mainVideo.load();
+}catch(e){}
+}
+
+function closeVideoPlayer(){
+playerOverlay.classList.remove('show');
 document.body.style.overflow = '';
+destroyHls();
+try{
+  if(document.fullscreenElement){ document.exitFullscreen(); }
+}catch(e){}
+isFullscreen = false;
+if(controlsTimer) clearTimeout(controlsTimer);
+try{
+  if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+}catch(e){}
 }
-window.closeDownloadModal = closeDownloadModal;
-downloadModal.addEventListener("click", function(e){ if(e.target === downloadModal) closeDownloadModal(); });
+
+window.closeVideoPlayer = closeVideoPlayer;
+
+function retryPlay(){
+vpError.classList.remove('show');
+loadStream(currentUrl);
+}
+
+window.retryPlay = retryPlay;
+
+function toggleFullscreen(){
+try{
+  if(!document.fullscreenElement){
+    playerOverlay.requestFullscreen && playerOverlay.requestFullscreen().catch(function(){});
+    isFullscreen = true;
+  } else {
+    document.exitFullscreen();
+    isFullscreen = false;
+  }
+}catch(e){}
+}
+
+window.toggleFullscreen = toggleFullscreen;
+
+function showControls(){
+videoTopBar.classList.remove('hide');
+scheduleHideControls();
+}
+
+function hideControls(){
+videoTopBar.classList.add('hide');
+}
+
+function scheduleHideControls(){
+if(controlsTimer) clearTimeout(controlsTimer);
+controlsTimer = setTimeout(hideControls, 3000);
+}
+
+vpCenterTap.addEventListener('click', function(e){
+e.stopPropagation();
+if(videoTopBar.classList.contains('hide')){
+  showControls();
+} else {
+  hideControls();
+}
+});
+
+// زر الرجوع من أندرويد
+window.addEventListener('popstate', function(){
+if(playerOverlay.classList.contains('show')){
+  closeVideoPlayer();
+  try{ history.pushState(null, '', location.href); }catch(e){}
+}
+});
+try{ history.pushState(null, '', location.href); }catch(e){}
+
+// مفاتيح الكيبورد
+document.addEventListener('keydown', function(e){
+if(!playerOverlay.classList.contains('show')) return;
+if(e.key === 'Escape' || e.keyCode === 27){
+  closeVideoPlayer();
+}
+});
 
 function navHome(){currentCatIndex = -1;viewCategories.style.display = 'block';viewChannels.style.display = 'none';viewLive.style.display = 'none';catsGrid.innerHTML = loadingHtml('جاري التحميل...');var items = document.querySelectorAll('.nav-item');for(var i=0;i<items.length;i++) items[i].classList.remove('active');if(items[0]) items[0].classList.add('active');window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){ renderCategories(); }, 400);}
 function navLive(){currentCatIndex = -1;viewCategories.style.display = 'none';viewChannels.style.display = 'none';viewLive.style.display = 'block';liveList.innerHTML = loadingHtml('جاري تحميل القنوات...');var items = document.querySelectorAll('.nav-item');for(var i=0;i<items.length;i++) items[i].classList.remove('active');if(items[1]) items[1].classList.add('active');window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){ renderLiveView(); }, 500);}
@@ -498,4 +720,4 @@ window.openLiveChannel = openLiveChannel;
 </script>
 
 </body>
-  </html>
+</html>
