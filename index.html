@@ -170,14 +170,14 @@ body{background:
 @keyframes fadeInModal{from{opacity:0}to{opacity:1}}
 .pdm-panel{width:100%;max-width:420px;background:linear-gradient(180deg,#140d24,#0a0714);border-radius:26px;border:1px solid var(--border);padding:28px 22px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:popIn .35s cubic-bezier(.16,1,.3,1)}
 @keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
-.pdm-icon{width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,#ff8c1a,#e85d00);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 12px 40px rgba(255,107,0,.4)}
+.pdm-icon{width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 12px 40px rgba(124,58,237,.4)}
 .pdm-icon svg{width:44px;height:44px;fill:#fff}
 .pdm-title{color:#fff;font-size:20px;font-weight:900;margin-bottom:8px}
 .pdm-sub{color:var(--text-dim);font-size:13.5px;line-height:1.9;font-weight:600;margin-bottom:20px}
-.pdm-sub b{color:#ff8c1a}
+.pdm-sub b{color:#a855f7}
 .pdm-btn{width:100%;padding:18px 18px;border:0;border-radius:14px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:.15s;color:#fff;text-decoration:none;margin-bottom:10px}
 .pdm-btn:active{transform:scale(.97)}
-.pdm-btn.vlc{background:linear-gradient(135deg,#ff8c1a,#e85d00);box-shadow:0 10px 30px rgba(255,107,0,.4)}
+.pdm-btn.arix{background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 10px 30px rgba(124,58,237,.4)}
 .pdm-btn.close{background:transparent;color:var(--text-dim);border:1px solid var(--border);font-size:13px;padding:12px;margin-top:6px}
 .pdm-note{color:#7a6a9a;font-size:11px;text-align:center;margin-top:14px;line-height:1.7;font-weight:600}
 
@@ -292,18 +292,18 @@ body{background:
 <div class="drawer-footer">TITANGO TV © 2025<br>جميع الحقوق محفوظة</div>
 </div>
 
-<!-- DOWNLOAD MODAL (VLC فقط) -->
+<!-- DOWNLOAD MODAL (Arix Player) -->
 <div class="player-download-modal" id="playerDownloadModal">
 <div class="pdm-panel">
-<div class="pdm-icon"><svg viewBox="0 0 24 24"><path d="M12.03 2.25a1.5 1.5 0 0 0-1.5 1.5c0 .5.25.94.63 1.22L3.4 19.16a1.5 1.5 0 0 0 1.28 2.25h14.64a1.5 1.5 0 0 0 1.28-2.25L12.9 4.97c.38-.28.63-.72.63-1.22a1.5 1.5 0 0 0-1.5-1.5zM12 8.5l4.75 9.5h-9.5L12 8.5z"/></svg></div>
-<div class="pdm-title">محتاج تحمّل VLC</div>
-<div class="pdm-sub">عشان تشغّل القنوات لازم تحمّل مشغل <b>VLC</b><br>بعد التحميل ارجع للتطبيق واضغط القناة تاني</div>
-<a href="https://play.google.com/store/apps/details?id=org.videolan.vlc" target="_blank" class="pdm-btn vlc">
-<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.03 2.25a1.5 1.5 0 0 0-1.5 1.5c0 .5.25.94.63 1.22L3.4 19.16a1.5 1.5 0 0 0 1.28 2.25h14.64a1.5 1.5 0 0 0 1.28-2.25L12.9 4.97c.38-.28.63-.72.63-1.22a1.5 1.5 0 0 0-1.5-1.5zM12 8.5l4.75 9.5h-9.5L12 8.5z"/></svg>
-تحميل VLC من Google Play
+<div class="pdm-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+<div class="pdm-title">محتاج تحمّل Arix Player</div>
+<div class="pdm-sub">عشان تشغّل القنوات لازم تحمّل مشغل <b>Arix Player</b><br>بعد التحميل ارجع للتطبيق واضغط القناة تاني</div>
+<a href="https://play.google.com/store/apps/details?id=com.arix.player" target="_blank" class="pdm-btn arix">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+تحميل Arix Player من Google Play
 </a>
 <button class="pdm-btn close" onclick="closeDownloadModal()">✕ إغلاق</button>
-<div class="pdm-note">💡 VLC مجاني ومفتوح المصدر ويعمل بثبات في العراق</div>
+<div class="pdm-note">💡 Arix Player مشغل خفيف وسريع يدعم m3u8 و ts و m3u</div>
 </div>
 </div>
 
@@ -443,26 +443,26 @@ function openChannel(chi){var cat = categoriesData[currentCatIndex];if(!cat) ret
 function openLiveChannel(ci, chi){var cat = categoriesData[ci];if(!cat) return;handleChannelClick(cat.channels[chi]);}
 
 /* ═══════════════════════════════════════
-   🎬 PLAYER SYSTEM — VLC Only
+   🎬 PLAYER SYSTEM — Arix Player Only
 ═══════════════════════════════════════ */
-var PKG_VLC = 'org.videolan.vlc';
+var PKG_ARIX = 'com.arix.player';
 
 function handleChannelClick(ch){
 if(!ch) return;
 if(!ch.live){ showToast('القناة غير متاحة حالياً'); return; }
 if(!ch.url){ showToast('لا يوجد رابط للبث'); return; }
 pendingPlayerUrl = ch.url;
-showToast('جاري فتح VLC...', 'success');
-launchVLC();
+showToast('جاري فتح Arix Player...', 'success');
+launchArix();
 }
 
-function launchVLC(){
+function launchArix(){
 var url = pendingPlayerUrl;
 if(!url) return;
 var isHttps = url.toLowerCase().startsWith("https");
 var scheme = isHttps ? "https" : "http";
 var urlNoProto = url.replace(/^https?:\/\//i, "");
-var intentUrl = "intent://" + urlNoProto + "#Intent;scheme=" + scheme + ";type=video/*;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=" + PKG_VLC + ";end";
+var intentUrl = "intent://" + urlNoProto + "#Intent;scheme=" + scheme + ";type=video/*;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=" + PKG_ARIX + ";end";
 var opened = false;
 var mark = function(){ opened = true; };
 document.addEventListener("visibilitychange", mark, { once: true });
@@ -498,4 +498,4 @@ window.openLiveChannel = openLiveChannel;
 </script>
 
 </body>
-</html>
+  </html>
