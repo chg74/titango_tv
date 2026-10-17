@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
 <style>
 *{box-sizing:border-box;font-family:'Cairo',sans-serif;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 :root{
@@ -26,6 +25,7 @@ body{background:
   #0a0714;
   color:#fff;min-height:100vh;overscroll-behavior:none}
 
+/* ═══ SPLASH ═══ */
 #splash{position:fixed;inset:0;background:
   radial-gradient(1000px 500px at 50% 20%,rgba(124,58,237,.35),transparent 60%),
   radial-gradient(800px 500px at 50% 90%,rgba(6,182,212,.25),transparent 60%),
@@ -35,9 +35,18 @@ body{background:
 #splash .splash-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.4),transparent 70%);animation:splashPulse 2s ease-in-out infinite}
 @keyframes splashPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.3);opacity:.3}}
 #splash img{width:55%;max-width:240px;object-fit:contain;filter:drop-shadow(0 0 40px rgba(168,85,247,.7));position:relative;z-index:2;animation:splashIn 2s ease-in-out forwards}
-@keyframes splashIn{0%{opacity:0;transform:scale(.6) rotate(-8deg)}30%{opacity:1;transform:scale(1.08) rotate(3deg)}60%{opacity:1;transform:scale(1) rotate(0deg)}100%{opacity:0;transform:scale(1.4) rotate(0deg)}}
+@keyframes splashIn{
+  0%{opacity:0;transform:scale(.6) rotate(-8deg)}
+  30%{opacity:1;transform:scale(1.08) rotate(3deg)}
+  60%{opacity:1;transform:scale(1) rotate(0deg)}
+  100%{opacity:0;transform:scale(1.4) rotate(0deg)}
+}
 
-#activationScreen{position:fixed;inset:0;z-index:2147483644;background:radial-gradient(circle at 50% 20%,rgba(59,91,219,.15),transparent 60%),linear-gradient(180deg,#0a0714,#040209);display:none;flex-direction:column;justify-content:center;align-items:center;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+/* ═══ ACTIVATION SCREEN ═══ */
+#activationScreen{position:fixed;inset:0;z-index:2147483644;background:
+  radial-gradient(circle at 50% 20%,rgba(59,91,219,.15),transparent 60%),
+  linear-gradient(180deg,#0a0714,#040209);
+  display:none;flex-direction:column;justify-content:center;align-items:center;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 #activationScreen.show{display:flex}
 .activation-card{max-width:420px;width:100%;background:linear-gradient(180deg,#1e263e,#171d30);border-radius:24px;padding:36px 26px 28px;text-align:center;border:1px solid rgba(100,120,180,.15);box-shadow:0 24px 60px rgba(0,0,0,.6);animation:actIn .4s ease}
 @keyframes actIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
@@ -57,6 +66,7 @@ body{background:
 @keyframes spin{to{transform:rotate(360deg)}}
 .activation-btn.telegram{background:linear-gradient(180deg,#38bdf8,#0ea5e9);color:#fff;box-shadow:0 10px 26px rgba(14,165,233,.3);margin-bottom:0}
 
+/* ═══ VPN / LOCK SCREENS ═══ */
 #vpnBlockScreen{position:fixed;inset:0;z-index:2147483646;background:radial-gradient(circle at 50% 30%,rgba(124,58,237,.25),transparent 60%),linear-gradient(180deg,#0a0714,#040209);display:none;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;text-align:center;overflow-y:auto}
 #vpnBlockScreen.show{display:flex}
 .vpn-shield-icon{width:130px;height:130px;border-radius:36px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;margin-bottom:30px;box-shadow:0 20px 80px rgba(124,58,237,.6);animation:vpnPulse 1.8s ease-in-out infinite;position:relative;flex-shrink:0}
@@ -90,8 +100,10 @@ body{background:
 .lock-refresh-btn:active{transform:scale(.96)}
 .lock-refresh-btn svg{width:20px;height:20px;fill:#fff}
 
+/* ═══ APP ═══ */
 #app{display:none;opacity:0;transition:opacity .5s;min-height:100vh;padding-top:calc(var(--safe-top) + 12px);padding-bottom:calc(96px + var(--safe-bottom));position:relative;z-index:1}
 #app.show{display:block;opacity:1}
+
 .app-topbar{position:sticky;top:0;z-index:50;padding:8px 14px 14px;background:linear-gradient(180deg,rgba(10,7,20,.92),rgba(10,7,20,.55) 70%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .app-topbar-inner{display:flex;align-items:center;gap:10px;max-width:640px;margin:0 auto}
 .topbar-btn{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(6,182,212,.12));border:1px solid var(--border);display:flex;justify-content:center;align-items:center;flex-shrink:0;cursor:pointer;transition:.2s;text-decoration:none}
@@ -166,45 +178,55 @@ body{background:
 .toast.error{background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 8px 28px rgba(239,68,68,.5)}
 .toast.success{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 28px rgba(16,185,129,.5)}
 
-/* ═══ VIDEO PLAYER OVERLAY ═══ */
-.video-player-overlay{position:fixed;inset:0;z-index:2147483645;background:#000;display:none;flex-direction:column;overflow:hidden}
-.video-player-overlay.show{display:flex}
-.video-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#000}
-.video-stage video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
-.video-top-bar{position:absolute;top:0;left:0;right:0;z-index:20;padding:calc(var(--safe-top) + 10px) 14px 30px;background:linear-gradient(180deg,rgba(0,0,0,.85),rgba(0,0,0,.4) 60%,transparent);display:flex;align-items:center;gap:12px;transition:opacity .3s,transform .3s}
-.video-top-bar.hide{opacity:0;transform:translateY(-10px);pointer-events:none}
-.vp-close-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;backdrop-filter:blur(10px);transition:.2s}
-.vp-close-btn:active{transform:scale(.92);background:rgba(239,68,68,.4)}
-.vp-close-btn svg{width:20px;height:20px;fill:#fff}
-.vp-channel-info{flex:1;min-width:0;text-align:right;padding-inline-end:4px}
-.vp-channel-name{color:#fff;font-size:14px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 8px rgba(0,0,0,.7)}
-.vp-channel-live{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font-size:10.5px;font-weight:700;color:#ef4444}
-.vp-channel-live::before{content:'';width:7px;height:7px;border-radius:50%;background:#ef4444;box-shadow:0 0 10px #ef4444;animation:liveBlink 1.2s infinite}
-@keyframes liveBlink{50%{opacity:.4}}
-.vp-fullscreen-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;backdrop-filter:blur(10px);transition:.2s}
-.vp-fullscreen-btn:active{transform:scale(.92);background:rgba(124,58,237,.5)}
-.vp-fullscreen-btn svg{width:20px;height:20px;fill:#fff}
-.vp-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(0,0,0,.7);z-index:15;backdrop-filter:blur(4px)}
-.vp-loading .spinner{width:60px;height:60px;border-width:3.5px}
-.vp-loading-text{color:#e0d5ff;font-size:13px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.7)}
-.vp-error{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(0,0,0,.92);padding:30px;text-align:center;z-index:18}
-.vp-error.show{display:flex}
-.vp-error-icon{width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,#ef4444,#b91c1c);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(239,68,68,.5)}
-.vp-error-icon svg{width:44px;height:44px;fill:#fff}
-.vp-error-title{color:#fff;font-size:18px;font-weight:900}
-.vp-error-text{color:#c8b8e0;font-size:13px;line-height:1.8;font-weight:600;max-width:340px}
-.vp-error-btn{background:linear-gradient(135deg,var(--p1),var(--c1));color:#fff;border:none;padding:13px 32px;border-radius:100px;font-size:14px;font-weight:900;font-family:'Cairo',sans-serif;cursor:pointer;box-shadow:0 8px 24px var(--glow);margin-top:6px;transition:.2s}
-.vp-error-btn:active{transform:scale(.96)}
-.vp-center-tap{position:absolute;inset:0;z-index:12;cursor:pointer;background:transparent}
+.player-download-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.94);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:20px}
+.player-download-modal.show{display:flex;animation:fadeInModal .3s}
+@keyframes fadeInModal{from{opacity:0}to{opacity:1}}
+.pdm-panel{width:100%;max-width:420px;background:linear-gradient(180deg,#140d24,#0a0714);border-radius:26px;border:1px solid var(--border);padding:30px 24px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:popIn .35s cubic-bezier(.16,1,.3,1)}
+@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pdm-icon{width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,var(--p1),var(--c1));display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 12px 40px var(--glow)}
+.pdm-icon svg{width:44px;height:44px;fill:#fff}
+.pdm-title{color:#fff;font-size:19px;font-weight:900;margin-bottom:8px}
+.pdm-sub{color:var(--text-dim);font-size:13px;line-height:1.8;font-weight:600;margin-bottom:22px}
+.pdm-btn{width:100%;padding:16px 18px;border:0;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:.15s;color:#fff;text-decoration:none;margin-bottom:10px}
+.pdm-btn:active{transform:scale(.97)}
+.pdm-btn.mx{background:linear-gradient(135deg,var(--p1),var(--p2));box-shadow:0 10px 30px var(--glow)}
+.pdm-btn.vlc{background:linear-gradient(135deg,#ff8c1a,#e85d00);box-shadow:0 10px 30px rgba(255,107,0,.4)}
+.pdm-btn.close{background:transparent;color:var(--text-dim);border:1px solid var(--border);font-size:13px;padding:12px;margin-top:6px}
+.pdm-note{color:#7a6a9a;font-size:11px;text-align:center;margin-top:14px;line-height:1.7;font-weight:600}
 
-@media (min-width: 768px){.grid-cards{grid-template-columns:repeat(4,1fr);gap:16px}.app-content,.app-topbar-inner{max-width:1000px}.app-bottomnav{max-width:1000px;margin:0 auto;border-radius:20px 20px 0 0;border-left:1px solid var(--border);border-right:1px solid var(--border)}.card .card-logo{width:72px;height:72px}.card .card-name{font-size:13px}}
-@media (min-width: 1024px){.grid-cards{grid-template-columns:repeat(5,1fr);gap:20px}.app-content,.app-topbar-inner,.app-bottomnav{max-width:1300px}.card{min-height:155px;padding:20px 10px 15px}.card .card-logo{width:88px;height:88px}.card .card-name{font-size:14px}}
-@media (min-width: 1400px){.grid-cards{grid-template-columns:repeat(6,1fr);gap:22px}.app-content,.app-topbar-inner,.app-bottomnav{max-width:1600px}.card{min-height:175px}.card .card-logo{width:100px;height:100px}.card .card-name{font-size:15px}}
-@media (orientation: landscape) and (max-height: 500px){.grid-cards{grid-template-columns:repeat(6,1fr);gap:10px}.app-content{max-width:100%}.card{min-height:100px;padding:10px 6px 8px}.card .card-logo{width:50px;height:50px}.card .card-name{font-size:11px}}
+@media (min-width: 768px) {
+    .grid-cards { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .app-content, .app-topbar-inner { max-width: 1000px; }
+    .app-bottomnav { max-width: 1000px; margin: 0 auto; border-radius: 20px 20px 0 0; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+    .card .card-logo { width: 72px; height: 72px; }
+    .card .card-name { font-size: 13px; }
+}
+@media (min-width: 1024px) {
+    .grid-cards { grid-template-columns: repeat(5, 1fr); gap: 20px; }
+    .app-content, .app-topbar-inner, .app-bottomnav { max-width: 1300px; }
+    .card { min-height: 155px; padding: 20px 10px 15px; }
+    .card .card-logo { width: 88px; height: 88px; }
+    .card .card-name { font-size: 14px; }
+}
+@media (min-width: 1400px) {
+    .grid-cards { grid-template-columns: repeat(6, 1fr); gap: 22px; }
+    .app-content, .app-topbar-inner, .app-bottomnav { max-width: 1600px; }
+    .card { min-height: 175px; }
+    .card .card-logo { width: 100px; height: 100px; }
+    .card .card-name { font-size: 15px; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+    .grid-cards { grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .app-content { max-width: 100%; }
+    .card { min-height: 100px; padding: 10px 6px 8px; }
+    .card .card-logo { width: 50px; height: 50px; }
+    .card .card-name { font-size: 11px; }
+}
 </style>
 </head>
 <body>
 
+<!-- ACTIVATION SCREEN -->
 <div id="activationScreen">
 <div class="activation-card">
 <h1 class="activation-title">تفعيل التطبيق</h1>
@@ -305,40 +327,20 @@ body{background:
 <span class="di-icon"><svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></span>
 <span class="di-text">خروج من التطبيق<small>إغلاق التطبيق نهائياً</small></span>
 </button>
-<div class="drawer-footer">TITANGO TV © 2025<br>جميع الحقوق محفوظة</div>
+<div class="drawer-footer">
+TITANGO TV © 2025<br>جميع الحقوق محفوظة
+</div>
 </div>
 
-<!-- ═══ IN-APP VIDEO PLAYER ═══ -->
-<div class="video-player-overlay" id="videoPlayerOverlay">
-<div class="video-stage">
-<video id="mainVideo" playsinline preload="auto"></video>
-
-<div class="video-top-bar" id="videoTopBar">
-<button class="vp-close-btn" onclick="closeVideoPlayer()" aria-label="close">
-<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-</button>
-<div class="vp-channel-info">
-<div class="vp-channel-name" id="vpChannelName">القناة</div>
-<div class="vp-channel-live">مباشر</div>
-</div>
-<button class="vp-fullscreen-btn" onclick="toggleFullscreen()" aria-label="fullscreen">
-<svg id="vpFullscreenIcon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-</button>
-</div>
-
-<div class="vp-center-tap" id="vpCenterTap"></div>
-
-<div class="vp-loading" id="vpLoading">
-<div class="spinner"></div>
-<div class="vp-loading-text">جاري تحميل القناة...</div>
-</div>
-
-<div class="vp-error" id="vpError">
-<div class="vp-error-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
-<div class="vp-error-title">القناة مش شغالة دلوقتي</div>
-<div class="vp-error-text">حاول تاني أو اختر قناة تانية</div>
-<button class="vp-error-btn" onclick="retryPlay()">🔄 حاول تاني</button>
-</div>
+<div class="player-download-modal" id="playerDownloadModal">
+<div class="pdm-panel">
+<div class="pdm-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+<div class="pdm-title">محتاج تحمّل مشغل</div>
+<div class="pdm-sub">مفيش مشغل فيديو مثبت على جهازك<br>حمّل واحد من دول عشان تشغّل القنوات</div>
+<a href="https://play.google.com/store/apps/details?id=com.mxtech.videoplayer.ad" target="_blank" class="pdm-btn mx"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>تحميل MX Player</a>
+<a href="https://play.google.com/store/apps/details?id=org.videolan.vlc" target="_blank" class="pdm-btn vlc"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12.03 2.25a1.5 1.5 0 0 0-1.5 1.5c0 .5.25.94.63 1.22L3.4 19.16a1.5 1.5 0 0 0 1.28 2.25h14.64a1.5 1.5 0 0 0 1.28-2.25L12.9 4.97c.38-.28.63-.72.63-1.22a1.5 1.5 0 0 0-1.5-1.5zM12 8.5l4.75 9.5h-9.5L12 8.5z"/></svg>تحميل VLC</a>
+<button class="pdm-btn close" onclick="closeDownloadModal()">✕ إغلاق</button>
+<div class="pdm-note">💡 بعد التحميل ارجع للتطبيق واضغط على القناة تاني</div>
 </div>
 </div>
 
@@ -362,7 +364,6 @@ if(s) s.classList.add('show');
 var a = document.getElementById('app'); if(a) a.style.display = 'none';
 var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';
 var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';
-var vp = document.getElementById('videoPlayerOverlay'); if(vp) vp.classList.remove('show');
 window.categoriesData = [];
 if(window.fdb){
 try{ if(window.categoriesRef) window.categoriesRef.off(); }catch(e){}
@@ -375,16 +376,167 @@ if(window.heartbeatInterval) clearInterval(window.heartbeatInterval);
 
 var VPN_KEYWORDS = ['vpn','nordvpn','expressvpn','surfshark','cyberghost','protonvpn','private internet access','mullvad','ipvanish','hidemyass','tunnelbear','windscribe','hotspot shield','purevpn','vyprvpn','astrill','hide.me','ivpn','strongvpn','keepsolid','betternet','hola vpn','turbo vpn','ufo vpn','zenmate','browsec','touchvpn','speedify','hiddify','psiphon','lantern','shadowsocks','v2ray','xray','trojan','wireguard','openvpn','outline','clash','sing-box','nekobox','v2box','throne','digitalocean','linode','vultr','hetzner','ovh sas','amazonaws','google cloud','microsoft azure','alibaba cloud','leaseweb','m247','quadranet','colocrossing','contabo','scaleway','upcloud','kamatera','ionos','liquidweb','choopa','zenlayer','datacamp','cdn77','tzulo','frantech','buyvm','serverius','hostkey','worldstream','psychz','steadfast','hivelocity','sharktech','hostiserver','egihosting','anonymous','dedicated server','cloud hosting','vps hosting'];
 var SAFE_KEYWORDS = ['vodafone','etisalat','orange','we telecom','telecom egypt','te data','tedata','linkdotnet','noor','nitel','mobinil','stc','mobily','zain','ooredoo','verizon','at&t','comcast','spectrum','charter','t-mobile','bt ','sky broadband','virgin media','talktalk','plusnet','ee limited','deutsche telekom','sfr','bouygues','telefonica','movistar','telecom italia','fastweb','tiscali','etisalat misr','orange egypt','centurylink','telstra','optus','singtel','rogers','bell canada','telus','kddi','softbank','ntt ','jio','airtel','claro','tigo','entel'];
-function checkKeyword(text){if(!text) return false;var lower = text.toLowerCase().trim();for(var i=0;i<SAFE_KEYWORDS.length;i++){if(lower.indexOf(SAFE_KEYWORDS[i]) !== -1){for(var j=0;j<VPN_KEYWORDS.length;j++){ if(lower.indexOf(VPN_KEYWORDS[j]) !== -1) return true; }return false;}}for(var k=0;k<VPN_KEYWORDS.length;k++){ if(lower.indexOf(VPN_KEYWORDS[k]) !== -1) return true; }return false;}
-function fetchText(url, timeout){return new Promise(function(resolve){var done = false;var t = setTimeout(function(){ if(!done){ done=true; resolve(null); } }, timeout || 5000);try{fetch(url, {cache:'no-store', mode:'cors', credentials:'omit'}).then(function(r){ if(!r.ok) throw new Error('bad'); return r.text(); }).then(function(txt){ if(done) return; done=true; clearTimeout(t); resolve(txt); }).catch(function(){ if(!done){ done=true; clearTimeout(t); resolve(null); } });}catch(e){ if(!done){ done=true; clearTimeout(t); resolve(null); } }});}
-function extractIP(text){if(!text) return null;var ipLine = /(?:^|\n)ip=((?:\d{1,3}\.){3}\d{1,3})/i.exec(text);var ip = ipLine ? ipLine[1] : null;if(!ip){ var m = /\b((?:\d{1,3}\.){3}\d{1,3})\b/.exec(text); if(m) ip = m[1]; }if(!ip) return null;var parts = ip.split('.').map(Number);if(parts[0] > 255 || parts[1] > 255 || parts[2] > 255 || parts[3] > 255) return null;if(parts[0] === 10) return null;if(parts[0] === 127) return null;if(parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return null;if(parts[0] === 192 && parts[1] === 168) return null;if(parts[0] === 169 && parts[1] === 254) return null;if(parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) return null;if(parts[0] === 0) return null;return ip;}
-function fetchAllIPs(){var sources = ['https://api.ipify.org?format=text','https://ipapi.co/ip/','https://ipinfo.io/ip','https://ipv4.icanhazip.com','https://ifconfig.me/ip','https://checkip.amazonaws.com','https://www.cloudflare.com/cdn-cgi/trace','https://one.one.one.one/cdn-cgi/trace'];return Promise.all(sources.map(function(url){return fetchText(url, 4500).then(function(txt){ if(!txt) return null; return { url: url, text: txt.substring(0, 500), ip: extractIP(txt) }; });})).then(function(results){ return results.filter(function(r){ return r && r.ip; }); });}
-function getWebRTCIPs(){return new Promise(function(resolve){var ips = {};var done = false;var pc;try{ pc = new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}); }catch(e){ return resolve([]); }function finish(){ if(done) return; done = true; try{ pc.close(); }catch(e){} resolve(Object.keys(ips)); }pc.onicecandidate = function(ice){if(!ice || !ice.candidate){ finish(); return; }var c = ice.candidate.candidate || '';var m = /([0-9]{1,3}(?:\.[0-9]{1,3}){3})/.exec(c);if(m){var ip = m[1];var parts = ip.split('.').map(Number);if(parts[0] === 0 || parts[0] === 127) return;if(parts[0] === 10) return;if(parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return;if(parts[0] === 192 && parts[1] === 168) return;if(parts[0] === 169 && parts[1] === 254) return;if(parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) return;ips[ip] = true;}};try{ pc.createDataChannel('x'); pc.createOffer().then(function(o){ return pc.setLocalDescription(o); }).catch(function(){ finish(); }); }catch(e){ finish(); }setTimeout(finish, 3500);});}
-function parseTrace(text){var r = { ip:null, loc:null, warp:null };if(!text) return r;text.split('\n').forEach(function(line){var i = line.indexOf('=');if(i === -1) return;var k = line.substring(0,i).trim();var v = line.substring(i+1).trim();if(k === 'ip') r.ip = v;if(k === 'loc') r.loc = v;if(k === 'warp') r.warp = v;});return r;}
-function detectVPN(){return Promise.all([fetchAllIPs(), getWebRTCIPs()]).then(function(res){var httpResults = res[0] || [];var rtcIPs = res[1] || [];var strongSignals = 0;var weakSignals = 0;for(var i=0;i<httpResults.length;i++){var r = httpResults[i];if(r.url.indexOf('cloudflare.com/cdn-cgi') !== -1 || r.url.indexOf('1.1.1.1/cdn-cgi') !== -1 || r.url.indexOf('one.one.one.one/cdn-cgi') !== -1){var tr = parseTrace(r.text);if(tr.warp === 'on' || tr.warp === 'plus'){ strongSignals++; }}}for(var m=0;m<httpResults.length;m++){var txt = (httpResults[m].text || '').toLowerCase();var orgMatch = /"org"\s*:\s*"([^"]+)"/i.exec(txt);var ispMatch = /"isp"\s*:\s*"([^"]+)"/i.exec(txt);if(orgMatch && checkKeyword(orgMatch[1])){ strongSignals++; }if(ispMatch && checkKeyword(ispMatch[1])){ strongSignals++; }}var uniqueHttpIPs = [];for(var j=0;j<httpResults.length;j++){var ip = httpResults[j].ip;if(uniqueHttpIPs.indexOf(ip) === -1) uniqueHttpIPs.push(ip);}if(uniqueHttpIPs.length >= 3){ weakSignals++; }if(uniqueHttpIPs.length > 0 && rtcIPs.length > 0){var found = false;for(var k=0;k<rtcIPs.length;k++){ if(uniqueHttpIPs.indexOf(rtcIPs[k]) !== -1){ found = true; break; } }if(!found){ weakSignals++; }}if(rtcIPs.length > 1){ weakSignals++; }var isVpn = false;if(strongSignals >= 1) isVpn = true;else if(weakSignals >= 2) isVpn = true;return { isVpn: isVpn };}).catch(function(e){ return { isVpn: false }; });}
-function showVpnBlock(){if(vpnLocked) return;vpnLocked = true;try{var s = document.getElementById('vpnBlockScreen');if(s) s.classList.add('show');var a = document.getElementById('app'); if(a) a.style.display = 'none';var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';var vp = document.getElementById('videoPlayerOverlay'); if(vp) vp.classList.remove('show');try{ window.closeVideoPlayer && window.closeVideoPlayer(); }catch(e){}window.categoriesData = [];if(window.fdb){try{ if(window.categoriesRef) window.categoriesRef.off(); }catch(e){}try{ if(window.viewerRef) window.viewerRef.off(); }catch(e){}try{ window.fdb.goOffline(); }catch(e){}}if(window.heartbeatInterval) clearInterval(window.heartbeatInterval);}catch(e){}}
-function hideVpnBlock(){if(!vpnLocked) return;vpnLocked = false;try{var s = document.getElementById('vpnBlockScreen');if(s) s.classList.remove('show');}catch(e){}}
-function vpnWatchLoop(){detectVPN().then(function(info){if(info.isVpn){showVpnBlock();if(sessionStorage.getItem('wasWatching') === '1'){sessionStorage.removeItem('wasWatching');try{ setTimeout(function(){ try{ window.location.reload(); }catch(e){} }, 1500); }catch(e){}}} else { hideVpnBlock(); }});}
+function checkKeyword(text){
+if(!text) return false;
+var lower = text.toLowerCase().trim();
+for(var i=0;i<SAFE_KEYWORDS.length;i++){
+if(lower.indexOf(SAFE_KEYWORDS[i]) !== -1){
+for(var j=0;j<VPN_KEYWORDS.length;j++){ if(lower.indexOf(VPN_KEYWORDS[j]) !== -1) return true; }
+return false;
+}
+}
+for(var k=0;k<VPN_KEYWORDS.length;k++){ if(lower.indexOf(VPN_KEYWORDS[k]) !== -1) return true; }
+return false;
+}
+function fetchText(url, timeout){
+return new Promise(function(resolve){
+var done = false;
+var t = setTimeout(function(){ if(!done){ done=true; resolve(null); } }, timeout || 5000);
+try{
+fetch(url, {cache:'no-store', mode:'cors', credentials:'omit'}).then(function(r){ if(!r.ok) throw new Error('bad'); return r.text(); }).then(function(txt){ if(done) return; done=true; clearTimeout(t); resolve(txt); }).catch(function(){ if(!done){ done=true; clearTimeout(t); resolve(null); } });
+}catch(e){ if(!done){ done=true; clearTimeout(t); resolve(null); } }
+});
+}
+function extractIP(text){
+if(!text) return null;
+var ipLine = /(?:^|\n)ip=((?:\d{1,3}\.){3}\d{1,3})/i.exec(text);
+var ip = ipLine ? ipLine[1] : null;
+if(!ip){ var m = /\b((?:\d{1,3}\.){3}\d{1,3})\b/.exec(text); if(m) ip = m[1]; }
+if(!ip) return null;
+var parts = ip.split('.').map(Number);
+if(parts[0] > 255 || parts[1] > 255 || parts[2] > 255 || parts[3] > 255) return null;
+if(parts[0] === 10) return null;
+if(parts[0] === 127) return null;
+if(parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return null;
+if(parts[0] === 192 && parts[1] === 168) return null;
+if(parts[0] === 169 && parts[1] === 254) return null;
+if(parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) return null;
+if(parts[0] === 0) return null;
+return ip;
+}
+function fetchAllIPs(){
+var sources = ['https://api.ipify.org?format=text','https://ipapi.co/ip/','https://ipinfo.io/ip','https://ipv4.icanhazip.com','https://ifconfig.me/ip','https://checkip.amazonaws.com','https://www.cloudflare.com/cdn-cgi/trace','https://one.one.one.one/cdn-cgi/trace'];
+return Promise.all(sources.map(function(url){
+return fetchText(url, 4500).then(function(txt){ if(!txt) return null; return { url: url, text: txt.substring(0, 500), ip: extractIP(txt) }; });
+})).then(function(results){ return results.filter(function(r){ return r && r.ip; }); });
+}
+function getWebRTCIPs(){
+return new Promise(function(resolve){
+var ips = {};
+var done = false;
+var pc;
+try{ pc = new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]}); }catch(e){ return resolve([]); }
+function finish(){ if(done) return; done = true; try{ pc.close(); }catch(e){} resolve(Object.keys(ips)); }
+pc.onicecandidate = function(ice){
+if(!ice || !ice.candidate){ finish(); return; }
+var c = ice.candidate.candidate || '';
+var m = /([0-9]{1,3}(?:\.[0-9]{1,3}){3})/.exec(c);
+if(m){
+var ip = m[1];
+var parts = ip.split('.').map(Number);
+if(parts[0] === 0 || parts[0] === 127) return;
+if(parts[0] === 10) return;
+if(parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return;
+if(parts[0] === 192 && parts[1] === 168) return;
+if(parts[0] === 169 && parts[1] === 254) return;
+if(parts[0] === 100 && parts[1] >= 64 && parts[1] <= 127) return;
+ips[ip] = true;
+}
+};
+try{ pc.createDataChannel('x'); pc.createOffer().then(function(o){ return pc.setLocalDescription(o); }).catch(function(){ finish(); }); }catch(e){ finish(); }
+setTimeout(finish, 3500);
+});
+}
+function parseTrace(text){
+var r = { ip:null, loc:null, warp:null };
+if(!text) return r;
+text.split('\n').forEach(function(line){
+var i = line.indexOf('=');
+if(i === -1) return;
+var k = line.substring(0,i).trim();
+var v = line.substring(i+1).trim();
+if(k === 'ip') r.ip = v;
+if(k === 'loc') r.loc = v;
+if(k === 'warp') r.warp = v;
+});
+return r;
+}
+function detectVPN(){
+return Promise.all([fetchAllIPs(), getWebRTCIPs()]).then(function(res){
+var httpResults = res[0] || [];
+var rtcIPs = res[1] || [];
+var strongSignals = 0;
+var weakSignals = 0;
+for(var i=0;i<httpResults.length;i++){
+var r = httpResults[i];
+if(r.url.indexOf('cloudflare.com/cdn-cgi') !== -1 || r.url.indexOf('1.1.1.1/cdn-cgi') !== -1 || r.url.indexOf('one.one.one.one/cdn-cgi') !== -1){
+var tr = parseTrace(r.text);
+if(tr.warp === 'on' || tr.warp === 'plus'){ strongSignals++; }
+}
+}
+for(var m=0;m<httpResults.length;m++){
+var txt = (httpResults[m].text || '').toLowerCase();
+var orgMatch = /"org"\s*:\s*"([^"]+)"/i.exec(txt);
+var ispMatch = /"isp"\s*:\s*"([^"]+)"/i.exec(txt);
+if(orgMatch && checkKeyword(orgMatch[1])){ strongSignals++; }
+if(ispMatch && checkKeyword(ispMatch[1])){ strongSignals++; }
+}
+var uniqueHttpIPs = [];
+for(var j=0;j<httpResults.length;j++){
+var ip = httpResults[j].ip;
+if(uniqueHttpIPs.indexOf(ip) === -1) uniqueHttpIPs.push(ip);
+}
+if(uniqueHttpIPs.length >= 3){ weakSignals++; }
+if(uniqueHttpIPs.length > 0 && rtcIPs.length > 0){
+var found = false;
+for(var k=0;k<rtcIPs.length;k++){ if(uniqueHttpIPs.indexOf(rtcIPs[k]) !== -1){ found = true; break; } }
+if(!found){ weakSignals++; }
+}
+if(rtcIPs.length > 1){ weakSignals++; }
+var isVpn = false;
+if(strongSignals >= 1) isVpn = true;
+else if(weakSignals >= 2) isVpn = true;
+return { isVpn: isVpn };
+}).catch(function(e){ return { isVpn: false }; });
+}
+function showVpnBlock(){
+if(vpnLocked) return;
+vpnLocked = true;
+try{
+var s = document.getElementById('vpnBlockScreen');
+if(s) s.classList.add('show');
+var a = document.getElementById('app'); if(a) a.style.display = 'none';
+var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';
+var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';
+var dm = document.getElementById('playerDownloadModal'); if(dm) dm.classList.remove('show');
+window.categoriesData = [];
+if(window.fdb){
+try{ if(window.categoriesRef) window.categoriesRef.off(); }catch(e){}
+try{ if(window.viewerRef) window.viewerRef.off(); }catch(e){}
+try{ window.fdb.goOffline(); }catch(e){}
+}
+if(window.heartbeatInterval) clearInterval(window.heartbeatInterval);
+}catch(e){}
+}
+function hideVpnBlock(){
+if(!vpnLocked) return;
+vpnLocked = false;
+try{
+var s = document.getElementById('vpnBlockScreen');
+if(s) s.classList.remove('show');
+}catch(e){}
+}
+function vpnWatchLoop(){
+detectVPN().then(function(info){
+if(info.isVpn){
+showVpnBlock();
+if(sessionStorage.getItem('wasWatching') === '1'){
+sessionStorage.removeItem('wasWatching');
+try{ setTimeout(function(){ try{ window.location.reload(); }catch(e){} }, 1500); }catch(e){}
+}
+} else { hideVpnBlock(); }
+});
+}
 setTimeout(vpnWatchLoop, 1200);
 setInterval(vpnWatchLoop, 6000);
 document.addEventListener('visibilitychange', function(){ if(!document.hidden){ vpnWatchLoop(); } });
@@ -392,7 +544,16 @@ window.addEventListener('blur', function(){ sessionStorage.setItem('wasWatching'
 window.addEventListener('focus', function(){ setTimeout(vpnWatchLoop, 100); });
 window.addEventListener('pageshow', function(){ setTimeout(vpnWatchLoop, 100); });
 window.addEventListener('online', function(){ vpnWatchLoop(); });
-document.addEventListener('keydown', function(e){var k = e.keyCode || e.which;if(k === 123){ e.preventDefault(); e.stopPropagation(); return false; }if(e.ctrlKey && e.shiftKey){ if([73,74,67,75,69,77,83,105,106,99,107,101,109,115].indexOf(k) !== -1){ e.preventDefault(); e.stopPropagation(); return false; } }if(e.ctrlKey && (k === 85 || k === 117)){ e.preventDefault(); return false; }if(e.ctrlKey && (k === 83 || k === 115)){ e.preventDefault(); return false; }if(e.ctrlKey && (k === 80 || k === 112)){ e.preventDefault(); return false; }if(e.ctrlKey && (k === 65 || k === 97)){ e.preventDefault(); return false; }if(e.ctrlKey && !e.shiftKey && (k === 67 || k === 99)){ e.preventDefault(); return false; }}, true);
+document.addEventListener('keydown', function(e){
+var k = e.keyCode || e.which;
+if(k === 123){ e.preventDefault(); e.stopPropagation(); return false; }
+if(e.ctrlKey && e.shiftKey){ if([73,74,67,75,69,77,83,105,106,99,107,101,109,115].indexOf(k) !== -1){ e.preventDefault(); e.stopPropagation(); return false; } }
+if(e.ctrlKey && (k === 85 || k === 117)){ e.preventDefault(); return false; }
+if(e.ctrlKey && (k === 83 || k === 115)){ e.preventDefault(); return false; }
+if(e.ctrlKey && (k === 80 || k === 112)){ e.preventDefault(); return false; }
+if(e.ctrlKey && (k === 65 || k === 97)){ e.preventDefault(); return false; }
+if(e.ctrlKey && !e.shiftKey && (k === 67 || k === 99)){ e.preventDefault(); return false; }
+}, true);
 document.addEventListener('contextmenu', function(e){ e.preventDefault(); return false; }, true);
 document.addEventListener('copy', function(e){ e.preventDefault(); return false; }, true);
 document.addEventListener('cut', function(e){ e.preventDefault(); return false; }, true);
@@ -400,7 +561,18 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); return f
 document.addEventListener('touchstart', function(e){ if(e.touches.length > 1){ e.preventDefault(); } }, { passive: false });
 document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, false);
 var DEVTOOLS_DETECTION_ENABLED = !isInIframe && !isMobile;
-function detectDevTools(){if(!DEVTOOLS_DETECTION_ENABLED) return;if(locked) return;var wDiff = window.outerWidth - window.innerWidth;var hDiff = window.outerHeight - window.innerHeight;if(wDiff > 220 || hDiff > 320){var screenW = window.screen ? window.screen.width : window.innerWidth;var screenH = window.screen ? window.screen.height : window.innerHeight;if(screenW > 0 && (wDiff / screenW) > 0.25){ showDevToolsLock(); return; }if(screenH > 0 && (hDiff / screenH) > 0.35){ showDevToolsLock(); return; }}}
+function detectDevTools(){
+if(!DEVTOOLS_DETECTION_ENABLED) return;
+if(locked) return;
+var wDiff = window.outerWidth - window.innerWidth;
+var hDiff = window.outerHeight - window.innerHeight;
+if(wDiff > 220 || hDiff > 320){
+var screenW = window.screen ? window.screen.width : window.innerWidth;
+var screenH = window.screen ? window.screen.height : window.innerHeight;
+if(screenW > 0 && (wDiff / screenW) > 0.25){ showDevToolsLock(); return; }
+if(screenH > 0 && (hDiff / screenH) > 0.35){ showDevToolsLock(); return; }
+}
+}
 if(DEVTOOLS_DETECTION_ENABLED){ setInterval(detectDevTools, 800); setTimeout(detectDevTools, 1000); }
 try{ var noop = function(){ return undefined; }; var fakeConsole = {log:noop,warn:noop,error:noop,info:noop,debug:noop,trace:noop,dir:noop,table:noop,group:noop,groupEnd:noop,time:noop,timeEnd:noop,assert:noop,count:noop,clear:noop}; Object.defineProperty(window, 'console', { get: function(){ return fakeConsole; }, configurable: false }); }catch(e){}
 try{ if(window.performance && performance.clearResourceTimings){ performance.clearResourceTimings(); setInterval(function(){ try{ performance.clearResourceTimings(); }catch(e){} }, 5000); } }catch(e){}
@@ -421,296 +593,449 @@ var catsGrid = $('catsGrid'), channelsGrid = $('channelsGrid');
 var viewCategories = $('viewCategories'), viewChannels = $('viewChannels');
 var viewLive = $('viewLive'), liveList = $('liveList'), liveCount = $('liveCount');
 var catTitle = $('catTitle'), toast = $('toast');
-var bottomNav = $('bottomNav');
+var bottomNav = $('bottomNav'), downloadModal = $('playerDownloadModal');
 var drawer = $('drawer'), drawerOverlay = $('drawerOverlay');
 var categoriesData = [];
 window.categoriesData = categoriesData;
 var currentCatIndex = -1;
 var appStarted = false;
 
-function showToast(msg, type){toast.textContent = msg;toast.classList.remove('error','success');if(type) toast.classList.add(type);toast.classList.add('show');clearTimeout(showToast._t);showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 2500);}
+function showToast(msg, type){
+toast.textContent = msg;
+toast.classList.remove('error','success');
+if(type) toast.classList.add(type);
+toast.classList.add('show');
+clearTimeout(showToast._t);
+showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 2500);
+}
 window.showToast = showToast;
 
 /* ═══════════════════════════════════════
-   🔐 ACTIVATION SYSTEM
+   🔐 ACTIVATION SYSTEM (FIXED)
 ═══════════════════════════════════════ */
 var ACTIVATION_KEY = 'titango_activation_code';
 var currentAppCode = '';
 var activationWatcherStarted = false;
-function getSavedCode(){try{ return localStorage.getItem(ACTIVATION_KEY) || ''; }catch(e){ return ''; }}
-function setSavedCode(v){try{ localStorage.setItem(ACTIVATION_KEY, v); }catch(e){}}
-function clearSavedCode(){try{ localStorage.removeItem(ACTIVATION_KEY); }catch(e){}}
-function showActivationScreen(errorMsg){var s = document.getElementById('activationScreen');if(s) s.classList.add('show');var a = document.getElementById('app');if(a){ a.style.display = 'none'; a.classList.remove('show'); }var sp = document.getElementById('splash');if(sp) sp.style.display = 'none';var bn = document.getElementById('bottomNav');if(bn) bn.style.display = 'none';var inp = document.getElementById('activationInput');if(inp){inp.value = '';inp.disabled = false;try{ setTimeout(function(){ inp.focus(); }, 200); }catch(e){}}var btn = document.getElementById('activateBtn');if(btn){ btn.disabled = false; btn.classList.remove('loading'); }setActivationError(errorMsg || '');}
-function hideActivationScreen(){var s = document.getElementById('activationScreen');if(s) s.classList.remove('show');}
-function enterAppClean(){hideActivationScreen();var sp = document.getElementById('splash');if(sp) sp.classList.add('hide');var a = document.getElementById('app');if(a){ a.style.display = 'block'; a.style.opacity = '0'; a.classList.add('show'); }var bn = document.getElementById('bottomNav');if(bn) bn.style.display = 'flex';appStarted = true;try{ setTimeout(function(){ if(a) a.style.opacity = '1'; }, 30); }catch(e){}}
-function setActivationError(msg){var el = document.getElementById('activationError');if(!el) return;if(msg){el.textContent = msg;el.style.display = 'block';} else {el.textContent = '';el.style.display = 'none';}}
-function setActivationLoading(on){var btn = document.getElementById('activateBtn');if(!btn) return;if(on){btn.disabled = true;btn.classList.add('loading');} else {btn.disabled = false;btn.classList.remove('loading');}}
-function startAppFlow(){var resolved = false;var timeout = setTimeout(function(){if(resolved) return;resolved = true;currentAppCode = '';enterAppClean();initActivationWatcher();}, 5000);try{fdb.ref('app_code').once('value').then(function(snap){if(resolved) return;resolved = true;clearTimeout(timeout);currentAppCode = String(snap.val() == null ? '' : snap.val()).trim();applyCodeState();initActivationWatcher();}).catch(function(){if(resolved) return;resolved = true;clearTimeout(timeout);currentAppCode = '';enterAppClean();initActivationWatcher();});}catch(e){if(resolved) return;resolved = true;clearTimeout(timeout);currentAppCode = '';enterAppClean();initActivationWatcher();}}
-function applyCodeState(){if(!currentAppCode){enterAppClean();return;}var saved = getSavedCode();if(saved && saved === currentAppCode){enterAppClean();} else {showActivationScreen();}}
-function submitActivation(){var inp = document.getElementById('activationInput');if(!inp) return;var val = (inp.value || '').trim();if(!val){setActivationError('من فضلك أدخل كود التفعيل');return;}setActivationError('');setActivationLoading(true);var verify = function(code){setActivationLoading(false);if(!code){currentAppCode = '';enterAppClean();showToast('تم فتح التطبيق — الكود اتشال', 'success');return;}if(val === code){setSavedCode(val);currentAppCode = code;if(inp) inp.value = '';showToast('تم التفعيل بنجاح ✅', 'success');setTimeout(function(){ enterAppClean(); }, 400);} else {setActivationError('❌ كود غير صحيح — تأكد من الكود وحاول تاني');try{ inp.value = ''; inp.focus(); }catch(e){}}};try{fdb.ref('app_code').once('value').then(function(snap){var code = String(snap.val() == null ? '' : snap.val()).trim();currentAppCode = code;verify(code);}).catch(function(){verify(currentAppCode);});}catch(e){verify(currentAppCode);}}
-function initActivationWatcher(){if(activationWatcherStarted) return;activationWatcherStarted = true;try{fdb.ref('app_code').on('value', function(snap){var code = String(snap.val() == null ? '' : snap.val()).trim();var oldCode = currentAppCode;currentAppCode = code;if(!code){clearSavedCode();enterAppClean();showToast('تم فتح التطبيق للجميع', 'success');return;}var saved = getSavedCode();if(saved !== code){showActivationScreen(oldCode && oldCode !== code ? '⚠️ تم تغيير كود التفعيل — أدخل الكود الجديد' : '');} else {hideActivationScreen();enterAppClean();}}, function(){});}catch(e){}}
+
+function getSavedCode(){
+  try{ return localStorage.getItem(ACTIVATION_KEY) || ''; }catch(e){ return ''; }
+}
+function setSavedCode(v){
+  try{ localStorage.setItem(ACTIVATION_KEY, v); }catch(e){}
+}
+function clearSavedCode(){
+  try{ localStorage.removeItem(ACTIVATION_KEY); }catch(e){}
+}
+
+function showActivationScreen(errorMsg){
+  var s = document.getElementById('activationScreen');
+  if(s) s.classList.add('show');
+
+  var a = document.getElementById('app');
+  if(a){ a.style.display = 'none'; a.classList.remove('show'); }
+
+  var sp = document.getElementById('splash');
+  if(sp) sp.style.display = 'none';
+
+  var bn = document.getElementById('bottomNav');
+  if(bn) bn.style.display = 'none';
+
+  var inp = document.getElementById('activationInput');
+  if(inp){
+    inp.value = '';
+    inp.disabled = false;
+    try{ setTimeout(function(){ inp.focus(); }, 200); }catch(e){}
+  }
+
+  var btn = document.getElementById('activateBtn');
+  if(btn){ btn.disabled = false; btn.classList.remove('loading'); }
+
+  setActivationError(errorMsg || '');
+}
+
+function hideActivationScreen(){
+  var s = document.getElementById('activationScreen');
+  if(s) s.classList.remove('show');
+}
+
+function enterAppClean(){
+  hideActivationScreen();
+  var sp = document.getElementById('splash');
+  if(sp) sp.classList.add('hide');
+  var a = document.getElementById('app');
+  if(a){ a.style.display = 'block'; a.style.opacity = '0'; a.classList.add('show'); }
+  var bn = document.getElementById('bottomNav');
+  if(bn) bn.style.display = 'flex';
+  appStarted = true;
+  try{ setTimeout(function(){ if(a) a.style.opacity = '1'; }, 30); }catch(e){}
+}
+
+function setActivationError(msg){
+  var el = document.getElementById('activationError');
+  if(!el) return;
+  if(msg){
+    el.textContent = msg;
+    el.style.display = 'block';
+  } else {
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+}
+
+function setActivationLoading(on){
+  var btn = document.getElementById('activateBtn');
+  if(!btn) return;
+  if(on){
+    btn.disabled = true;
+    btn.classList.add('loading');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function startAppFlow(){
+  var resolved = false;
+  var timeout = setTimeout(function(){
+    if(resolved) return;
+    resolved = true;
+    currentAppCode = '';
+    enterAppClean();
+    initActivationWatcher();
+  }, 5000);
+
+  try{
+    fdb.ref('app_code').once('value').then(function(snap){
+      if(resolved) return;
+      resolved = true;
+      clearTimeout(timeout);
+      currentAppCode = String(snap.val() == null ? '' : snap.val()).trim();
+      applyCodeState();
+      initActivationWatcher();
+    }).catch(function(){
+      if(resolved) return;
+      resolved = true;
+      clearTimeout(timeout);
+      currentAppCode = '';
+      enterAppClean();
+      initActivationWatcher();
+    });
+  }catch(e){
+    if(resolved) return;
+    resolved = true;
+    clearTimeout(timeout);
+    currentAppCode = '';
+    enterAppClean();
+    initActivationWatcher();
+  }
+}
+
+function applyCodeState(){
+  if(!currentAppCode){
+    enterAppClean();
+    return;
+  }
+  var saved = getSavedCode();
+  if(saved && saved === currentAppCode){
+    enterAppClean();
+  } else {
+    showActivationScreen();
+  }
+}
+
+function submitActivation(){
+  var inp = document.getElementById('activationInput');
+  if(!inp) return;
+  var val = (inp.value || '').trim();
+
+  if(!val){
+    setActivationError('من فضلك أدخل كود التفعيل');
+    return;
+  }
+
+  setActivationError('');
+  setActivationLoading(true);
+
+  var verify = function(code){
+    setActivationLoading(false);
+    if(!code){
+      currentAppCode = '';
+      enterAppClean();
+      showToast('تم فتح التطبيق — الكود اتشال', 'success');
+      return;
+    }
+    if(val === code){
+      setSavedCode(val);
+      currentAppCode = code;
+      if(inp) inp.value = '';
+      showToast('تم التفعيل بنجاح ✅', 'success');
+      setTimeout(function(){ enterAppClean(); }, 400);
+    } else {
+      setActivationError('❌ كود غير صحيح — تأكد من الكود وحاول تاني');
+      try{ inp.value = ''; inp.focus(); }catch(e){}
+    }
+  };
+
+  try{
+    fdb.ref('app_code').once('value').then(function(snap){
+      var code = String(snap.val() == null ? '' : snap.val()).trim();
+      currentAppCode = code;
+      verify(code);
+    }).catch(function(){
+      verify(currentAppCode);
+    });
+  }catch(e){
+    verify(currentAppCode);
+  }
+}
+
+function initActivationWatcher(){
+  if(activationWatcherStarted) return;
+  activationWatcherStarted = true;
+
+  try{
+    fdb.ref('app_code').on('value', function(snap){
+      var code = String(snap.val() == null ? '' : snap.val()).trim();
+      var oldCode = currentAppCode;
+      currentAppCode = code;
+
+      if(!code){
+        clearSavedCode();
+        enterAppClean();
+        showToast('تم فتح التطبيق للجميع', 'success');
+        return;
+      }
+
+      var saved = getSavedCode();
+      if(saved !== code){
+        showActivationScreen(
+          oldCode && oldCode !== code
+            ? '⚠️ تم تغيير كود التفعيل — أدخل الكود الجديد'
+            : ''
+        );
+      } else {
+        hideActivationScreen();
+        enterAppClean();
+      }
+    }, function(){});
+  }catch(e){}
+}
+
 window.submitActivation = submitActivation;
-(function(){var inp = document.getElementById('activationInput');if(inp){inp.addEventListener('keydown', function(e){if(e.key === 'Enter' || e.keyCode === 13){e.preventDefault();submitActivation();}});inp.addEventListener('input', function(){setActivationError('');});}})();
+
+(function(){
+  var inp = document.getElementById('activationInput');
+  if(inp){
+    inp.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.keyCode === 13){
+        e.preventDefault();
+        submitActivation();
+      }
+    });
+    inp.addEventListener('input', function(){
+      setActivationError('');
+    });
+  }
+})();
+
 setTimeout(function(){ startAppFlow(); }, 2500);
 
 /* ═══ DRAWER ═══ */
-function openDrawer(){drawer.classList.add('show');drawerOverlay.classList.add('show');document.body.style.overflow = 'hidden';}
-function closeDrawer(){drawer.classList.remove('show');drawerOverlay.classList.remove('show');document.body.style.overflow = '';}
-function exitApp(){try{if(navigator.app && navigator.app.exitApp){navigator.app.exitApp();} else if(window.close){window.close();setTimeout(function(){try{ window.open('', '_self'); window.close(); }catch(e){}try{ history.back(); }catch(e){}}, 100);} else {try{ window.location.href = 'about:blank'; }catch(e){}}}catch(e){}}
+function openDrawer(){
+drawer.classList.add('show');
+drawerOverlay.classList.add('show');
+document.body.style.overflow = 'hidden';
+}
+function closeDrawer(){
+drawer.classList.remove('show');
+drawerOverlay.classList.remove('show');
+document.body.style.overflow = '';
+}
+function exitApp(){
+try{
+if(navigator.app && navigator.app.exitApp){
+navigator.app.exitApp();
+} else if(window.close){
+window.close();
+setTimeout(function(){
+try{ window.open('', '_self'); window.close(); }catch(e){}
+try{ history.back(); }catch(e){}
+}, 100);
+} else {
+try{ window.location.href = 'about:blank'; }catch(e){}
+}
+}catch(e){}
+}
 window.openDrawer = openDrawer;
 window.closeDrawer = closeDrawer;
 window.exitApp = exitApp;
 
 var categoriesRef = null, viewerRef = null, heartbeatInt = null;
-function initFirebase(){categoriesRef = fdb.ref('categories');viewerRef = fdb.ref('viewers/' + MY_ID);window.categoriesRef = categoriesRef;window.viewerRef = viewerRef;categoriesRef.on('value', function(snap){try{const raw = snap.val();if(!raw){ categoriesData = []; window.categoriesData = categoriesData; }else{let parsed = null;try{ parsed = typeof raw === 'string' ? JSON.parse(raw) : raw; }catch(e){ parsed = null; }categoriesData = Array.isArray(parsed) ? parsed : [];window.categoriesData = categoriesData;}renderCurrentView();}catch(e){}}, function(err){});function sendHeartbeat(){ try{ viewerRef.set(Date.now()); }catch(e){} }sendHeartbeat();heartbeatInt = setInterval(sendHeartbeat, 8000);window.heartbeatInterval = heartbeatInt;try{ viewerRef.onDisconnect().remove(); }catch(e){}}
+function initFirebase(){
+categoriesRef = fdb.ref('categories');
+viewerRef = fdb.ref('viewers/' + MY_ID);
+window.categoriesRef = categoriesRef;
+window.viewerRef = viewerRef;
+categoriesRef.on('value', function(snap){
+try{
+const raw = snap.val();
+if(!raw){ categoriesData = []; window.categoriesData = categoriesData; }
+else{
+let parsed = null;
+try{ parsed = typeof raw === 'string' ? JSON.parse(raw) : raw; }catch(e){ parsed = null; }
+categoriesData = Array.isArray(parsed) ? parsed : [];
+window.categoriesData = categoriesData;
+}
+renderCurrentView();
+}catch(e){}
+}, function(err){});
+function sendHeartbeat(){ try{ viewerRef.set(Date.now()); }catch(e){} }
+sendHeartbeat();
+heartbeatInt = setInterval(sendHeartbeat, 8000);
+window.heartbeatInterval = heartbeatInt;
+try{ viewerRef.onDisconnect().remove(); }catch(e){}
+}
 initFirebase();
 
-function renderCurrentView(){if(currentCatIndex === -1) renderCategories();else renderChannels(currentCatIndex);}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g, function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
-function loadingHtml(text){return '<div class="loading-wrap" style="grid-column:1/-1"><div class="spinner"></div><span>'+(text||'جاري التحميل...')+'</span></div>';}
-function renderCategories(){if(!categoriesData.length){catsGrid.innerHTML = '<div class="loading-wrap" style="grid-column:1/-1"><div class="spinner"></div><span>جاري التحميل...</span></div>';setTimeout(function(){if(!categoriesData.length){catsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--text-dim);font-size:13px;line-height:2;font-weight:600">📺<br>لا توجد أقسام متاحة حالياً<br>تابع قناتنا على تيليجرام ليصلك كل جديد</div>';}}, 1500);return;}catsGrid.innerHTML = categoriesData.map(function(cat,i){var logo = cat.logo ? '<img class="card-logo" src="'+cat.logo+'" onerror="this.outerHTML=\'<div class=&quot;card-logo placeholder&quot;>📺</div>\'" alt="">' : '<div class="card-logo placeholder">📺</div>';return '<div class="card" onclick="openCategory('+i+')">' + logo + '<div class="card-name">'+escapeHtml(cat.name||'قسم')+'</div></div>';}).join('');}
-function renderChannels(ci){var cat = categoriesData[ci];if(!cat){ backToCategories(); return; }catTitle.textContent = cat.name || 'قنوات القسم';var list = cat.channels || [];if(!list.length){channelsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--text-dim);font-size:13px;line-height:2;font-weight:600">لا توجد قنوات في هذا القسم حالياً</div>';return;}channelsGrid.innerHTML = list.map(function(ch,chi){var logo = ch.logo ? '<img class="card-logo" src="'+ch.logo+'" onerror="this.outerHTML=\'<div class=&quot;card-logo placeholder&quot;>📺</div>\'" alt="">' : '<div class="card-logo placeholder">📺</div>';return '<div class="card '+(ch.live?'':'offline')+'" onclick="openChannel('+chi+')">' + logo + '<div class="card-name">'+escapeHtml(ch.name||'قناة')+'</div></div>';}).join('');}
-function renderLiveView(){var all = [];categoriesData.forEach(function(cat, ci){(cat.channels || []).forEach(function(ch, chi){all.push({ch: ch, catName: cat.name, ci: ci, chi: chi});});});all.sort(function(a,b){ return (b.ch.live?1:0) - (a.ch.live?1:0); });liveCount.textContent = all.length;if(!all.length){liveList.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--text-dim);font-size:13px;line-height:2;font-weight:600">📺<br>لا توجد قنوات متاحة حالياً</div>';return;}liveList.innerHTML = all.map(function(item){var logo = item.ch.logo ? '<img class="card-logo" src="'+item.ch.logo+'" onerror="this.outerHTML=\'<div class=&quot;card-logo placeholder&quot;>📺</div>\'" alt="">' : '<div class="card-logo placeholder">📺</div>';return '<div class="card '+(item.ch.live?'':'offline')+'" onclick="openLiveChannel('+item.ci+','+item.chi+')">' + logo + '<div class="card-name">'+escapeHtml(item.ch.name||'قناة')+'</div></div>';}).join('');}
+function renderCurrentView(){
+if(currentCatIndex === -1) renderCategories();
+else renderChannels(currentCatIndex);
+}
+function escapeHtml(s){
+return String(s).replace(/[&<>"']/g, function(ch){
+return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+});
+}
+function loadingHtml(text){
+return '<div class="loading-wrap" style="grid-column:1/-1"><div class="spinner"></div><span>'+(text||'جاري التحميل...')+'</span></div>';
+}
+function renderCategories(){
+if(!categoriesData.length){
+catsGrid.innerHTML = '<div class="loading-wrap" style="grid-column:1/-1"><div class="spinner"></div><span>جاري التحميل...</span></div>';
+setTimeout(function(){
+if(!categoriesData.length){
+catsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--text-dim);font-size:13px;line-height:2;font-weight:600">📺<br>لا توجد أقسام متاحة حالياً<br>تابع قناتنا على تيليجرام ليصلك كل جديد</div>';
+}
+}, 1500);
+return;
+}
+catsGrid.innerHTML = categoriesData.map(function(cat,i){
+var logo = cat.logo ? '<img class="card-logo" src="'+cat.logo+'" onerror="this.outerHTML=\'<div class=&quot;card-logo placeholder&quot;>📺</div>\'" alt="">' : '<div class="card-logo placeholder">📺</div>';
+return '<div class="card" onclick="openCategory('+i+')">' + logo + '<div class="card-name">'+escapeHtml(cat.name||'قسم')+'</div></div>';
+}).join('');
+}
+function renderChannels(ci){
+var cat = categoriesData[ci];
+if(!cat){ backToCategories(); return; }
+catTitle.textContent = cat.name || 'قنوات القسم';
+var list = cat.channels || [];
+if(!list.length){
+channelsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--text-dim);font-size:13px;line-height:2;font-weight:600">لا توجد قنوات في هذا القسم حالياً</div>';
+return;
+}
+channelsGrid.innerHTML = list.map(function(ch,chi){
+var logo = ch.logo ? '<img class="card-logo" src="'+ch.logo+'" onerror="this.outerHTML=\'<div class=&quot;card-logo placeholder&quot;>📺</div>\'" alt="">' : '<div class="card-logo placeholder">📺</div>';
+return '<div class="card '+(ch.live?'':'offline')+'" onclick="openChannel('+chi+')">' + logo + '<div class="card-name">'+escapeHtml(ch.name||'قناة')+'</div></div>';
+}).join('');
+}
+function renderLiveView(){
+var all = [];
+categoriesData.forEach(function(cat, ci){
+(cat.channels || []).forEach(function(ch, chi){
+all.push({ch: ch, catName: cat.name, ci: ci, chi: chi});
+});
+});
+all.sort(function(a,b){ return (b.ch.live?1:0) - (a.ch.live?1:0); });
+liveCount.textContent = all.length;
+if(!all.length){
+liveList.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--text-dim);font-size:13px;line-height:2;font-weight:600">📺<br>لا توجد قنوات متاحة حالياً</div>';
+return;
+}
+liveList.innerHTML = all.map(function(item){
+var logo = item.ch.logo ? '<img class="card-logo" src="'+item.ch.logo+'" onerror="this.outerHTML=\'<div class=&quot;card-logo placeholder&quot;>📺</div>\'" alt="">' : '<div class="card-logo placeholder">📺</div>';
+return '<div class="card '+(item.ch.live?'':'offline')+'" onclick="openLiveChannel('+item.ci+','+item.chi+')">' + logo + '<div class="card-name">'+escapeHtml(item.ch.name||'قناة')+'</div></div>';
+}).join('');
+}
 
-function openCategory(i){currentCatIndex = i;viewCategories.style.display = 'none';viewChannels.style.display = 'block';viewLive.style.display = 'none';channelsGrid.innerHTML = loadingHtml('جاري فتح القنوات...');catTitle.textContent = 'جاري التحميل...';window.scrollTo({top:0, behavior:'smooth'});setTimeout(function(){ renderChannels(i); }, 400);}
-function backToCategories(){currentCatIndex = -1;viewCategories.style.display = 'block';viewChannels.style.display = 'none';viewLive.style.display = 'none';catsGrid.innerHTML = loadingHtml('جاري التحميل...');window.scrollTo({top:0, behavior:'smooth'});setTimeout(function(){ renderCategories(); }, 400);}
-function openChannel(chi){var cat = categoriesData[currentCatIndex];if(!cat) return;handleChannelClick(cat.channels[chi]);}
-function openLiveChannel(ci, chi){var cat = categoriesData[ci];if(!cat) return;handleChannelClick(cat.channels[chi]);}
-
-/* ═══════════════════════════════════════
-   🎬 IN-APP VIDEO PLAYER (HLS.js)
-   لا يظهر رابط البث نهائياً
-═══════════════════════════════════════ */
-var playerOverlay = document.getElementById('videoPlayerOverlay');
-var mainVideo = document.getElementById('mainVideo');
-var vpLoading = document.getElementById('vpLoading');
-var vpError = document.getElementById('vpError');
-var vpChannelName = document.getElementById('vpChannelName');
-var videoTopBar = document.getElementById('videoTopBar');
-var vpCenterTap = document.getElementById('vpCenterTap');
-var currentHls = null;
-var currentUrl = '';
-var currentChannelName = '';
-var controlsTimer = null;
-var isFullscreen = false;
-
+function openCategory(i){
+currentCatIndex = i;
+viewCategories.style.display = 'none';
+viewChannels.style.display = 'block';
+viewLive.style.display = 'none';
+channelsGrid.innerHTML = loadingHtml('جاري فتح القنوات...');
+catTitle.textContent = 'جاري التحميل...';
+window.scrollTo({top:0, behavior:'smooth'});
+setTimeout(function(){ renderChannels(i); }, 400);
+}
+function backToCategories(){
+currentCatIndex = -1;
+viewCategories.style.display = 'block';
+viewChannels.style.display = 'none';
+viewLive.style.display = 'none';
+catsGrid.innerHTML = loadingHtml('جاري التحميل...');
+window.scrollTo({top:0, behavior:'smooth'});
+setTimeout(function(){ renderCategories(); }, 400);
+}
+function openChannel(chi){
+var cat = categoriesData[currentCatIndex];
+if(!cat) return;
+handleChannelClick(cat.channels[chi]);
+}
+function openLiveChannel(ci, chi){
+var cat = categoriesData[ci];
+if(!cat) return;
+handleChannelClick(cat.channels[chi]);
+}
 function handleChannelClick(ch){
 if(!ch) return;
 if(!ch.live){ showToast('القناة غير متاحة حالياً'); return; }
 if(!ch.url){ showToast('لا يوجد رابط للبث'); return; }
-openVideoPlayer(ch.url, ch.name || 'قناة');
+openPlayerWithUrl(ch.url, ch.name);
 }
-
-function openVideoPlayer(url, name){
-currentUrl = url;
-currentChannelName = name;
-vpChannelName.textContent = name;
-
-// عرض الشاشة
-playerOverlay.classList.add('show');
-document.body.style.overflow = 'hidden';
-
-// إخفاء القوائم
-vpLoading.style.display = 'flex';
-vpError.classList.remove('show');
-
-// منع قفل الشاشة
-try{
-  if('wakeLock' in navigator){
-    navigator.wakeLock.request('screen').catch(function(){});
-  }
-}catch(e){}
-
-loadStream(url);
-scheduleHideControls();
+function openPlayerWithUrl(url, name){
+showToast('جاري فتح المشغل...', 'success');
+const isHttps = url.toLowerCase().startsWith("https");
+const scheme = isHttps ? "https" : "http";
+const urlNoProto = url.replace(/^https?:\/\//i, "");
+let opened = false;
+const mark = function(){ opened = true; };
+document.addEventListener("visibilitychange", mark, { once: true });
+window.addEventListener("pagehide", mark, { once: true });
+window.addEventListener("blur", mark, { once: true });
+const intentUrl = "intent://" + urlNoProto + "#Intent;scheme=" + scheme + ";type=video/*;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.mxtech.videoplayer.ad;end";
+try{ window.location.href = intentUrl; }catch(e){}
+setTimeout(function(){ if(!opened && !document.hidden && document.visibilityState === "visible"){ try{ window.open(url, "_blank"); }catch(e){} } }, 1500);
+setTimeout(function(){ if(!opened && !document.hidden && document.visibilityState === "visible"){ showDownloadModal(); } }, 3500);
 }
+function showDownloadModal(){ downloadModal.classList.add('show'); }
+function closeDownloadModal(){ downloadModal.classList.remove('show'); }
+window.closeDownloadModal = closeDownloadModal;
+downloadModal.addEventListener("click", function(e){ if(e.target === downloadModal) closeDownloadModal(); });
 
-function loadStream(url){
-destroyHls();
-
-if(!url){
-  showPlayerError();
-  return;
+function navHome(){
+currentCatIndex = -1;
+viewCategories.style.display = 'block';
+viewChannels.style.display = 'none';
+viewLive.style.display = 'none';
+catsGrid.innerHTML = loadingHtml('جاري التحميل...');
+var items = document.querySelectorAll('.nav-item');
+for(var i=0;i<items.length;i++) items[i].classList.remove('active');
+if(items[0]) items[0].classList.add('active');
+window.scrollTo({top:0,behavior:'smooth'});
+setTimeout(function(){ renderCategories(); }, 400);
 }
-
-var isM3U8 = /\.m3u8(\?|$)/i.test(url) || /m3u8/i.test(url);
-
-vpLoading.style.display = 'flex';
-vpError.classList.remove('show');
-
-if(isM3U8 && window.Hls && Hls.isSupported()){
-  currentHls = new Hls({
-    enableWorker: true,
-    lowLatencyMode: true,
-    backBufferLength: 30,
-    maxBufferLength: 30,
-    maxMaxBufferLength: 60
-  });
-  currentHls.loadSource(url);
-  currentHls.attachMedia(mainVideo);
-
-  currentHls.on(Hls.Events.MANIFEST_PARSED, function(){
-    vpLoading.style.display = 'none';
-    mainVideo.play().catch(function(){
-      // بعض المتصفحات تحتاج تفاعل المستخدم
-      mainVideo.muted = true;
-      mainVideo.play().then(function(){ mainVideo.muted = false; }).catch(function(){});
-    });
-  });
-
-  currentHls.on(Hls.Events.ERROR, function(event, data){
-    if(data && data.fatal){
-      switch(data.type){
-        case Hls.ErrorTypes.NETWORK_ERROR:
-          try{ currentHls.startLoad(); }catch(e){ showPlayerError(); }
-          break;
-        case Hls.ErrorTypes.MEDIA_ERROR:
-          try{ currentHls.recoverMediaError(); }catch(e){ showPlayerError(); }
-          break;
-        default:
-          showPlayerError();
-          break;
-      }
-    }
-  });
-
-  setTimeout(function(){
-    if(vpLoading.style.display !== 'none' && !mainVideo.videoWidth){
-      // شغل احتياطي بعد 12 ثانية
-    }
-  }, 12000);
-
-} else if(isM3U8 && mainVideo.canPlayType('application/vnd.apple.mpegurl')){
-  // iOS native HLS
-  mainVideo.src = url;
-  mainVideo.addEventListener('loadedmetadata', function onMeta(){
-    mainVideo.removeEventListener('loadedmetadata', onMeta);
-    vpLoading.style.display = 'none';
-    mainVideo.play().catch(function(){});
-  }, { once: true });
-  mainVideo.addEventListener('error', function onErr(){
-    mainVideo.removeEventListener('error', onErr);
-    showPlayerError();
-  }, { once: true });
-
-} else {
-  // MP4 أو TS مباشر
-  mainVideo.src = url;
-  mainVideo.addEventListener('loadedmetadata', function onMeta(){
-    mainVideo.removeEventListener('loadedmetadata', onMeta);
-    vpLoading.style.display = 'none';
-    mainVideo.play().catch(function(){
-      mainVideo.muted = true;
-      mainVideo.play().then(function(){ mainVideo.muted = false; }).catch(function(){});
-    });
-  }, { once: true });
-  mainVideo.addEventListener('error', function onErr(){
-    mainVideo.removeEventListener('error', onErr);
-    showPlayerError();
-  }, { once: true });
+function navLive(){
+currentCatIndex = -1;
+viewCategories.style.display = 'none';
+viewChannels.style.display = 'none';
+viewLive.style.display = 'block';
+liveList.innerHTML = loadingHtml('جاري تحميل القنوات...');
+var items = document.querySelectorAll('.nav-item');
+for(var i=0;i<items.length;i++) items[i].classList.remove('active');
+if(items[1]) items[1].classList.add('active');
+window.scrollTo({top:0,behavior:'smooth'});
+setTimeout(function(){ renderLiveView(); }, 500);
 }
-
-mainVideo.addEventListener('waiting', function(){ vpLoading.style.display = 'flex'; }, { once: false });
-mainVideo.addEventListener('playing', function(){ vpLoading.style.display = 'none'; }, { once: false });
-mainVideo.addEventListener('canplay', function(){ vpLoading.style.display = 'none'; }, { once: false });
-}
-
-function showPlayerError(){
-vpLoading.style.display = 'none';
-vpError.classList.add('show');
-}
-
-function destroyHls(){
-if(currentHls){
-  try{ currentHls.destroy(); }catch(e){}
-  currentHls = null;
-}
-try{
-  mainVideo.pause();
-  mainVideo.removeAttribute('src');
-  mainVideo.load();
-}catch(e){}
-}
-
-function closeVideoPlayer(){
-playerOverlay.classList.remove('show');
-document.body.style.overflow = '';
-destroyHls();
-try{
-  if(document.fullscreenElement){ document.exitFullscreen(); }
-}catch(e){}
-isFullscreen = false;
-if(controlsTimer) clearTimeout(controlsTimer);
-try{
-  if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-}catch(e){}
-}
-
-window.closeVideoPlayer = closeVideoPlayer;
-
-function retryPlay(){
-vpError.classList.remove('show');
-loadStream(currentUrl);
-}
-
-window.retryPlay = retryPlay;
-
-function toggleFullscreen(){
-try{
-  if(!document.fullscreenElement){
-    playerOverlay.requestFullscreen && playerOverlay.requestFullscreen().catch(function(){});
-    isFullscreen = true;
-  } else {
-    document.exitFullscreen();
-    isFullscreen = false;
-  }
-}catch(e){}
-}
-
-window.toggleFullscreen = toggleFullscreen;
-
-function showControls(){
-videoTopBar.classList.remove('hide');
-scheduleHideControls();
-}
-
-function hideControls(){
-videoTopBar.classList.add('hide');
-}
-
-function scheduleHideControls(){
-if(controlsTimer) clearTimeout(controlsTimer);
-controlsTimer = setTimeout(hideControls, 3000);
-}
-
-vpCenterTap.addEventListener('click', function(e){
-e.stopPropagation();
-if(videoTopBar.classList.contains('hide')){
-  showControls();
-} else {
-  hideControls();
-}
-});
-
-// زر الرجوع من أندرويد
-window.addEventListener('popstate', function(){
-if(playerOverlay.classList.contains('show')){
-  closeVideoPlayer();
-  try{ history.pushState(null, '', location.href); }catch(e){}
-}
-});
-try{ history.pushState(null, '', location.href); }catch(e){}
-
-// مفاتيح الكيبورد
-document.addEventListener('keydown', function(e){
-if(!playerOverlay.classList.contains('show')) return;
-if(e.key === 'Escape' || e.keyCode === 27){
-  closeVideoPlayer();
-}
-});
-
-function navHome(){currentCatIndex = -1;viewCategories.style.display = 'block';viewChannels.style.display = 'none';viewLive.style.display = 'none';catsGrid.innerHTML = loadingHtml('جاري التحميل...');var items = document.querySelectorAll('.nav-item');for(var i=0;i<items.length;i++) items[i].classList.remove('active');if(items[0]) items[0].classList.add('active');window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){ renderCategories(); }, 400);}
-function navLive(){currentCatIndex = -1;viewCategories.style.display = 'none';viewChannels.style.display = 'none';viewLive.style.display = 'block';liveList.innerHTML = loadingHtml('جاري تحميل القنوات...');var items = document.querySelectorAll('.nav-item');for(var i=0;i<items.length;i++) items[i].classList.remove('active');if(items[1]) items[1].classList.add('active');window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){ renderLiveView(); }, 500);}
 window.navHome = navHome;
 window.navLive = navLive;
 window.openCategory = openCategory;
