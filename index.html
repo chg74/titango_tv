@@ -331,13 +331,13 @@ TITANGO TV © 2025<br>جميع الحقوق محفوظة
 </div>
 </div>
 
-<!-- ═══ PLAYER DOWNLOAD MODAL (info.t4w.vp Only) ═══ -->
+<!-- ═══ PLAYER DOWNLOAD MODAL (maxplayer.mediaplayer.videoplayer) ═══ -->
 <div class="player-download-modal" id="playerDownloadModal">
 <div class="pdm-panel">
 <div class="pdm-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
 <div class="pdm-title">محتاج تحمّل المشغل</div>
 <div class="pdm-sub">عشان تشغّل القنوات، لازم يكون مشغل الفيديو متحمل على جهازك</div>
-<a href="https://play.google.com/store/apps/details?id=info.t4w.vp" target="_blank" rel="noopener" class="pdm-btn mx">
+<a href="https://play.google.com/store/apps/details?id=maxplayer.mediaplayer.videoplayer" target="_blank" rel="noopener" class="pdm-btn mx">
 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
 تحميل المشغل من Google Play
 </a>
@@ -996,12 +996,10 @@ openPlayerWithUrl(ch.url, ch.name);
 }
 
 /* ═══════════════════════════════════════
-   🎬 PLAYER OPEN LOGIC (info.t4w.vp)
-   - Opens the player immediately on tap
-   - If not installed → download modal appears
+   🎬 PLAYER OPEN LOGIC (maxplayer.mediaplayer.videoplayer)
 ═══════════════════════════════════════ */
-var TARGET_PLAYER_PKG = "info.t4w.vp";
-var PLAYER_STORE_URL = "https://play.google.com/store/apps/details?id=info.t4w.vp";
+var TARGET_PLAYER_PKG = "maxplayer.mediaplayer.videoplayer";
+var PLAYER_STORE_URL = "https://play.google.com/store/apps/details?id=maxplayer.mediaplayer.videoplayer";
 
 function openPlayerWithUrl(url, name){
   showToast('جاري فتح المشغل...', 'success');
@@ -1067,4 +1065,4 @@ window.openLiveChannel = openLiveChannel;
 </script>
 
 </body>
-  </html>
+</html>
