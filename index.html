@@ -8,8 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<!-- مكتبة تشغيل البث داخل المتصفح -->
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
 *{box-sizing:border-box;font-family:'Cairo',sans-serif;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 :root{
@@ -43,16 +41,6 @@ body{background:
   60%{opacity:1;transform:scale(1) rotate(0deg)}
   100%{opacity:0;transform:scale(1.4) rotate(0deg)}
 }
-
-/* ═══ INTERNAL PLAYER ═══ */
-#internalPlayerModal{position:fixed;inset:0;z-index:999999;background:#000;display:none;flex-direction:column}
-#internalPlayerModal.show{display:flex}
-.player-top-bar{display:flex;justify-content:space-between;align-items:center;padding:calc(var(--safe-top) + 15px) 20px 15px;background:linear-gradient(180deg,rgba(0,0,0,.9),transparent);position:absolute;top:0;left:0;right:0;z-index:10}
-.player-title{color:#fff;font-size:16px;font-weight:800}
-.close-player-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:20px;display:flex;justify-content:center;align-items:center;cursor:pointer;backdrop-filter:blur(10px)}
-.close-player-btn:active{background:rgba(255,255,255,.3)}
-.video-container{flex:1;display:flex;justify-content:center;align-items:center;width:100%;height:100%;position:relative}
-video{width:100%;max-height:100%;outline:none}
 
 /* ═══ ACTIVATION SCREEN ═══ */
 #activationScreen{position:fixed;inset:0;z-index:2147483644;background:
@@ -190,6 +178,21 @@ video{width:100%;max-height:100%;outline:none}
 .toast.error{background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 8px 28px rgba(239,68,68,.5)}
 .toast.success{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 28px rgba(16,185,129,.5)}
 
+.player-download-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.94);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:20px}
+.player-download-modal.show{display:flex;animation:fadeInModal .3s}
+@keyframes fadeInModal{from{opacity:0}to{opacity:1}}
+.pdm-panel{width:100%;max-width:420px;background:linear-gradient(180deg,#140d24,#0a0714);border-radius:26px;border:1px solid var(--border);padding:30px 24px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:popIn .35s cubic-bezier(.16,1,.3,1)}
+@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pdm-icon{width:84px;height:84px;border-radius:24px;background:linear-gradient(135deg,var(--p1),var(--c1));display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 12px 40px var(--glow)}
+.pdm-icon svg{width:44px;height:44px;fill:#fff}
+.pdm-title{color:#fff;font-size:19px;font-weight:900;margin-bottom:8px}
+.pdm-sub{color:var(--text-dim);font-size:13px;line-height:1.8;font-weight:600;margin-bottom:22px}
+.pdm-btn{width:100%;padding:16px 18px;border:0;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:.15s;color:#fff;text-decoration:none;margin-bottom:10px}
+.pdm-btn:active{transform:scale(.97)}
+.pdm-btn.mx{background:linear-gradient(135deg,var(--p1),var(--p2));box-shadow:0 10px 30px var(--glow)}
+.pdm-btn.close{background:transparent;color:var(--text-dim);border:1px solid var(--border);font-size:13px;padding:12px;margin-top:6px}
+.pdm-note{color:#7a6a9a;font-size:11px;text-align:center;margin-top:14px;line-height:1.7;font-weight:600}
+
 @media (min-width: 768px) {
     .grid-cards { grid-template-columns: repeat(4, 1fr); gap: 16px; }
     .app-content, .app-topbar-inner { max-width: 1000px; }
@@ -221,17 +224,6 @@ video{width:100%;max-height:100%;outline:none}
 </style>
 </head>
 <body>
-
-<!-- المشغل الداخلي -->
-<div id="internalPlayerModal">
-  <div class="player-top-bar">
-    <button class="close-player-btn" onclick="closeInternalPlayer()">✕</button>
-    <div class="player-title" id="playerChannelName">جاري التشغيل...</div>
-  </div>
-  <div class="video-container">
-    <video id="videoElement" controls autoplay playsinline></video>
-  </div>
-</div>
 
 <!-- ACTIVATION SCREEN -->
 <div id="activationScreen">
@@ -336,6 +328,21 @@ video{width:100%;max-height:100%;outline:none}
 </button>
 <div class="drawer-footer">
 TITANGO TV © 2025<br>جميع الحقوق محفوظة
+</div>
+</div>
+
+<!-- ═══ PLAYER DOWNLOAD MODAL (info.t4w.vp) ═══ -->
+<div class="player-download-modal" id="playerDownloadModal">
+<div class="pdm-panel">
+<div class="pdm-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+<div class="pdm-title">محتاج تحمّل المشغل</div>
+<div class="pdm-sub">عشان تشغّل القنوات، لازم يكون مشغل الفيديو متحمل على جهازك</div>
+<a href="https://play.google.com/store/apps/details?id=info.t4w.vp" target="_blank" rel="noopener" class="pdm-btn mx">
+<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+تحميل المشغل من Google Play
+</a>
+<button class="pdm-btn close" onclick="closeDownloadModal()">✕ إغلاق</button>
+<div class="pdm-note">💡 بعد التحميل، ارجع للتطبيق واضغط على القناة تاني</div>
 </div>
 </div>
 
@@ -587,13 +594,12 @@ var catsGrid = $('catsGrid'), channelsGrid = $('channelsGrid');
 var viewCategories = $('viewCategories'), viewChannels = $('viewChannels');
 var viewLive = $('viewLive'), liveList = $('liveList'), liveCount = $('liveCount');
 var catTitle = $('catTitle'), toast = $('toast');
-var bottomNav = $('bottomNav');
+var bottomNav = $('bottomNav'), downloadModal = $('playerDownloadModal');
 var drawer = $('drawer'), drawerOverlay = $('drawerOverlay');
 var categoriesData = [];
 window.categoriesData = categoriesData;
 var currentCatIndex = -1;
 var appStarted = false;
-var hls = null; // متغير للمشغل
 
 function showToast(msg, type){
 toast.textContent = msg;
@@ -612,67 +618,157 @@ var ACTIVATION_KEY = 'titango_activation_code';
 var currentAppCode = '';
 var activationWatcherStarted = false;
 
-function getSavedCode(){ try{ return localStorage.getItem(ACTIVATION_KEY) || ''; }catch(e){ return ''; } }
-function setSavedCode(v){ try{ localStorage.setItem(ACTIVATION_KEY, v); }catch(e){} }
-function clearSavedCode(){ try{ localStorage.removeItem(ACTIVATION_KEY); }catch(e){} }
+function getSavedCode(){
+  try{ return localStorage.getItem(ACTIVATION_KEY) || ''; }catch(e){ return ''; }
+}
+function setSavedCode(v){
+  try{ localStorage.setItem(ACTIVATION_KEY, v); }catch(e){}
+}
+function clearSavedCode(){
+  try{ localStorage.removeItem(ACTIVATION_KEY); }catch(e){}
+}
 
 function showActivationScreen(errorMsg){
   var s = document.getElementById('activationScreen');
   if(s) s.classList.add('show');
-  var a = document.getElementById('app'); if(a){ a.style.display = 'none'; a.classList.remove('show'); }
-  var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';
-  var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';
-  var inp = document.getElementById('activationInput'); if(inp){ inp.value = ''; inp.disabled = false; try{ setTimeout(function(){ inp.focus(); }, 200); }catch(e){} }
-  var btn = document.getElementById('activateBtn'); if(btn){ btn.disabled = false; btn.classList.remove('loading'); }
+
+  var a = document.getElementById('app');
+  if(a){ a.style.display = 'none'; a.classList.remove('show'); }
+
+  var sp = document.getElementById('splash');
+  if(sp) sp.style.display = 'none';
+
+  var bn = document.getElementById('bottomNav');
+  if(bn) bn.style.display = 'none';
+
+  var inp = document.getElementById('activationInput');
+  if(inp){
+    inp.value = '';
+    inp.disabled = false;
+    try{ setTimeout(function(){ inp.focus(); }, 200); }catch(e){}
+  }
+
+  var btn = document.getElementById('activateBtn');
+  if(btn){ btn.disabled = false; btn.classList.remove('loading'); }
+
   setActivationError(errorMsg || '');
 }
-function hideActivationScreen(){ var s = document.getElementById('activationScreen'); if(s) s.classList.remove('show'); }
+
+function hideActivationScreen(){
+  var s = document.getElementById('activationScreen');
+  if(s) s.classList.remove('show');
+}
+
 function enterAppClean(){
   hideActivationScreen();
-  var sp = document.getElementById('splash'); if(sp) sp.classList.add('hide');
-  var a = document.getElementById('app'); if(a){ a.style.display = 'block'; a.style.opacity = '0'; a.classList.add('show'); }
-  var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'flex';
+  var sp = document.getElementById('splash');
+  if(sp) sp.classList.add('hide');
+  var a = document.getElementById('app');
+  if(a){ a.style.display = 'block'; a.style.opacity = '0'; a.classList.add('show'); }
+  var bn = document.getElementById('bottomNav');
+  if(bn) bn.style.display = 'flex';
   appStarted = true;
   try{ setTimeout(function(){ if(a) a.style.opacity = '1'; }, 30); }catch(e){}
 }
+
 function setActivationError(msg){
-  var el = document.getElementById('activationError'); if(!el) return;
-  if(msg){ el.textContent = msg; el.style.display = 'block'; } else { el.textContent = ''; el.style.display = 'none'; }
+  var el = document.getElementById('activationError');
+  if(!el) return;
+  if(msg){
+    el.textContent = msg;
+    el.style.display = 'block';
+  } else {
+    el.textContent = '';
+    el.style.display = 'none';
+  }
 }
+
 function setActivationLoading(on){
-  var btn = document.getElementById('activateBtn'); if(!btn) return;
-  if(on){ btn.disabled = true; btn.classList.add('loading'); } else { btn.disabled = false; btn.classList.remove('loading'); }
+  var btn = document.getElementById('activateBtn');
+  if(!btn) return;
+  if(on){
+    btn.disabled = true;
+    btn.classList.add('loading');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
 }
+
 function startAppFlow(){
   var resolved = false;
   var timeout = setTimeout(function(){
-    if(resolved) return; resolved = true; currentAppCode = ''; enterAppClean(); initActivationWatcher();
+    if(resolved) return;
+    resolved = true;
+    currentAppCode = '';
+    enterAppClean();
+    initActivationWatcher();
   }, 5000);
+
   try{
     fdb.ref('app_code').once('value').then(function(snap){
-      if(resolved) return; resolved = true; clearTimeout(timeout);
+      if(resolved) return;
+      resolved = true;
+      clearTimeout(timeout);
       currentAppCode = String(snap.val() == null ? '' : snap.val()).trim();
-      applyCodeState(); initActivationWatcher();
+      applyCodeState();
+      initActivationWatcher();
     }).catch(function(){
-      if(resolved) return; resolved = true; clearTimeout(timeout); currentAppCode = ''; enterAppClean(); initActivationWatcher();
+      if(resolved) return;
+      resolved = true;
+      clearTimeout(timeout);
+      currentAppCode = '';
+      enterAppClean();
+      initActivationWatcher();
     });
-  }catch(e){ if(resolved) return; resolved = true; clearTimeout(timeout); currentAppCode = ''; enterAppClean(); initActivationWatcher(); }
+  }catch(e){
+    if(resolved) return;
+    resolved = true;
+    clearTimeout(timeout);
+    currentAppCode = '';
+    enterAppClean();
+    initActivationWatcher();
+  }
 }
+
 function applyCodeState(){
-  if(!currentAppCode){ enterAppClean(); return; }
+  if(!currentAppCode){
+    enterAppClean();
+    return;
+  }
   var saved = getSavedCode();
-  if(saved && saved === currentAppCode){ enterAppClean(); } else { showActivationScreen(); }
+  if(saved && saved === currentAppCode){
+    enterAppClean();
+  } else {
+    showActivationScreen();
+  }
 }
+
 function submitActivation(){
-  var inp = document.getElementById('activationInput'); if(!inp) return;
+  var inp = document.getElementById('activationInput');
+  if(!inp) return;
   var val = (inp.value || '').trim();
-  if(!val){ setActivationError('من فضلك أدخل كود التفعيل'); return; }
-  setActivationError(''); setActivationLoading(true);
+
+  if(!val){
+    setActivationError('من فضلك أدخل كود التفعيل');
+    return;
+  }
+
+  setActivationError('');
+  setActivationLoading(true);
+
   var verify = function(code){
     setActivationLoading(false);
-    if(!code){ currentAppCode = ''; enterAppClean(); showToast('تم فتح التطبيق — الكود اتشال', 'success'); return; }
+    if(!code){
+      currentAppCode = '';
+      enterAppClean();
+      showToast('تم فتح التطبيق — الكود اتشال', 'success');
+      return;
+    }
     if(val === code){
-      setSavedCode(val); currentAppCode = code; if(inp) inp.value = '';
+      setSavedCode(val);
+      currentAppCode = code;
+      if(inp) inp.value = '';
       showToast('تم التفعيل بنجاح ✅', 'success');
       setTimeout(function(){ enterAppClean(); }, 400);
     } else {
@@ -680,47 +776,95 @@ function submitActivation(){
       try{ inp.value = ''; inp.focus(); }catch(e){}
     }
   };
+
   try{
     fdb.ref('app_code').once('value').then(function(snap){
-      var code = String(snap.val() == null ? '' : snap.val()).trim(); currentAppCode = code; verify(code);
-    }).catch(function(){ verify(currentAppCode); });
-  }catch(e){ verify(currentAppCode); }
+      var code = String(snap.val() == null ? '' : snap.val()).trim();
+      currentAppCode = code;
+      verify(code);
+    }).catch(function(){
+      verify(currentAppCode);
+    });
+  }catch(e){
+    verify(currentAppCode);
+  }
 }
+
 function initActivationWatcher(){
   if(activationWatcherStarted) return;
   activationWatcherStarted = true;
+
   try{
     fdb.ref('app_code').on('value', function(snap){
       var code = String(snap.val() == null ? '' : snap.val()).trim();
-      var oldCode = currentAppCode; currentAppCode = code;
-      if(!code){ clearSavedCode(); enterAppClean(); showToast('تم فتح التطبيق للجميع', 'success'); return; }
+      var oldCode = currentAppCode;
+      currentAppCode = code;
+
+      if(!code){
+        clearSavedCode();
+        enterAppClean();
+        showToast('تم فتح التطبيق للجميع', 'success');
+        return;
+      }
+
       var saved = getSavedCode();
       if(saved !== code){
-        showActivationScreen(oldCode && oldCode !== code ? '⚠️ تم تغيير كود التفعيل — أدخل الكود الجديد' : '');
-      } else { hideActivationScreen(); enterAppClean(); }
+        showActivationScreen(
+          oldCode && oldCode !== code
+            ? '⚠️ تم تغيير كود التفعيل — أدخل الكود الجديد'
+            : ''
+        );
+      } else {
+        hideActivationScreen();
+        enterAppClean();
+      }
     }, function(){});
   }catch(e){}
 }
+
 window.submitActivation = submitActivation;
 
 (function(){
   var inp = document.getElementById('activationInput');
   if(inp){
-    inp.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.keyCode === 13){ e.preventDefault(); submitActivation(); } });
-    inp.addEventListener('input', function(){ setActivationError(''); });
+    inp.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.keyCode === 13){
+        e.preventDefault();
+        submitActivation();
+      }
+    });
+    inp.addEventListener('input', function(){
+      setActivationError('');
+    });
   }
 })();
 
 setTimeout(function(){ startAppFlow(); }, 2500);
 
 /* ═══ DRAWER ═══ */
-function openDrawer(){ drawer.classList.add('show'); drawerOverlay.classList.add('show'); document.body.style.overflow = 'hidden'; }
-function closeDrawer(){ drawer.classList.remove('show'); drawerOverlay.classList.remove('show'); document.body.style.overflow = ''; }
+function openDrawer(){
+drawer.classList.add('show');
+drawerOverlay.classList.add('show');
+document.body.style.overflow = 'hidden';
+}
+function closeDrawer(){
+drawer.classList.remove('show');
+drawerOverlay.classList.remove('show');
+document.body.style.overflow = '';
+}
 function exitApp(){
 try{
-if(navigator.app && navigator.app.exitApp){ navigator.app.exitApp(); }
-else if(window.close){ window.close(); setTimeout(function(){ try{ window.open('', '_self'); window.close(); }catch(e){} try{ history.back(); }catch(e){} }, 100); }
-else { try{ window.location.href = 'about:blank'; }catch(e){} }
+if(navigator.app && navigator.app.exitApp){
+navigator.app.exitApp();
+} else if(window.close){
+window.close();
+setTimeout(function(){
+try{ window.open('', '_self'); window.close(); }catch(e){}
+try{ history.back(); }catch(e){}
+}, 100);
+} else {
+try{ window.location.href = 'about:blank'; }catch(e){}
+}
 }catch(e){}
 }
 window.openDrawer = openDrawer;
@@ -843,69 +987,53 @@ var cat = categoriesData[ci];
 if(!cat) return;
 handleChannelClick(cat.channels[chi]);
 }
-
-/* ═══════════════════════════════════════
-   🎬 INTERNAL PLAYER LOGIC (داخل التطبيق)
-═══════════════════════════════════════ */
 function handleChannelClick(ch){
 if(!ch) return;
 if(!ch.live){ showToast('القناة غير متاحة حالياً'); return; }
 if(!ch.url){ showToast('لا يوجد رابط للبث'); return; }
-playChannel(ch.url, ch.name);
+openPlayerWithUrl(ch.url, ch.name);
 }
 
-function playChannel(url, name) {
-  document.getElementById('playerChannelName').textContent = name || 'جاري التشغيل...';
-  document.getElementById('internalPlayerModal').classList.add('show');
-  
-  var video = document.getElementById('videoElement');
-  var videoSrc = url;
+/* ═══════════════════════════════════════
+   🎬 PLAYER OPEN LOGIC (info.t4w.vp)
+   - Opens the player immediately on tap
+   - If not installed → download modal appears
+═══════════════════════════════════════ */
+var TARGET_PLAYER_PKG = "info.t4w.vp";
+var PLAYER_STORE_URL = "https://play.google.com/store/apps/details?id=info.t4w.vp";
 
-  // دعم الروابط التي لا تنتهي بـ m3u8 (مثل mp4 أو ts) بشكل مباشر
-  if (video.canPlayType('application/vnd.apple.mpegurl') || videoSrc.indexOf('.m3u8') === -1) {
-      video.src = videoSrc;
-  }
+function openPlayerWithUrl(url, name){
+  showToast('جاري فتح المشغل...', 'success');
 
-  if (typeof Hls !== 'undefined' && Hls.isSupported() && videoSrc.indexOf('.m3u8') !== -1) {
-    if(hls) { hls.destroy(); }
-    hls = new Hls();
-    hls.loadSource(videoSrc);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, function() {
-      video.play().catch(function(e){ console.log("Autoplay blocked"); });
-    });
-    hls.on(Hls.Events.ERROR, function (event, data) {
-      if (data.fatal) {
-        switch (data.type) {
-          case Hls.ErrorTypes.NETWORK_ERROR:
-            hls.startLoad();
-            break;
-          case Hls.ErrorTypes.MEDIA_ERROR:
-            hls.recoverMediaError();
-            break;
-          default:
-            showToast('حدث خطأ في تشغيل القناة', 'error');
-            closeInternalPlayer();
-            break;
-        }
-      }
-    });
-  } else {
-    // متصفحات آيفون (Safari) تدعم البث مباشرة
-    video.src = videoSrc;
-    video.play().catch(function(e){ console.log("Autoplay blocked"); });
-  }
+  var isHttps = url.toLowerCase().indexOf("https") === 0;
+  var scheme = isHttps ? "https" : "http";
+  var urlNoProto = url.replace(/^https?:\/\//i, "");
+
+  var opened = false;
+  var mark = function(){ opened = true; };
+  document.addEventListener("visibilitychange", mark, { once: true });
+  window.addEventListener("pagehide", mark, { once: true });
+  window.addEventListener("blur", mark, { once: true });
+
+  // استخدام الـ Intent القياسي الذي يدعمه التطبيق
+  var intentUrl = "intent://" + urlNoProto +
+    "#Intent;scheme=" + scheme +
+    ";package=" + TARGET_PLAYER_PKG +
+    ";action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end";
+
+  try { window.location.href = intentUrl; } catch(e) {}
+
+  setTimeout(function(){
+    if(!opened && !document.hidden && document.visibilityState === "visible"){
+      showDownloadModal();
+    }
+  }, 2500);
 }
 
-function closeInternalPlayer(){
-  document.getElementById('internalPlayerModal').classList.remove('show');
-  var video = document.getElementById('videoElement');
-  video.pause();
-  video.removeAttribute('src');
-  video.load();
-  if(hls){ hls.destroy(); hls = null; }
-}
-window.closeInternalPlayer = closeInternalPlayer;
+function showDownloadModal(){ downloadModal.classList.add('show'); }
+function closeDownloadModal(){ downloadModal.classList.remove('show'); }
+window.closeDownloadModal = closeDownloadModal;
+downloadModal.addEventListener("click", function(e){ if(e.target === downloadModal) closeDownloadModal(); });
 
 function navHome(){
 currentCatIndex = -1;
