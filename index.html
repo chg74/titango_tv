@@ -190,7 +190,6 @@ body{background:
 .pdm-btn{width:100%;padding:16px 18px;border:0;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:.15s;color:#fff;text-decoration:none;margin-bottom:10px}
 .pdm-btn:active{transform:scale(.97)}
 .pdm-btn.mx{background:linear-gradient(135deg,var(--p1),var(--p2));box-shadow:0 10px 30px var(--glow)}
-.pdm-btn.vlc{background:linear-gradient(135deg,#ff8c1a,#e85d00);box-shadow:0 10px 30px rgba(255,107,0,.4)}
 .pdm-btn.close{background:transparent;color:var(--text-dim);border:1px solid var(--border);font-size:13px;padding:12px;margin-top:6px}
 .pdm-note{color:#7a6a9a;font-size:11px;text-align:center;margin-top:14px;line-height:1.7;font-weight:600}
 
@@ -332,14 +331,13 @@ TITANGO TV © 2025<br>جميع الحقوق محفوظة
 </div>
 </div>
 
-<!-- ═══ PLAYER DOWNLOAD MODAL (Updated to TDM) ═══ -->
+<!-- ═══ PLAYER DOWNLOAD MODAL (IPTV Smarters Only) ═══ -->
 <div class="player-download-modal" id="playerDownloadModal">
 <div class="pdm-panel">
 <div class="pdm-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-<div class="pdm-title">محتاج تحمّل TDM Player</div>
-<div class="pdm-sub">مفيش مشغل TDM مثبت على جهازك<br>حمّل TDM عشان تشغّل القنوات</div>
-<a href="https://play.google.com/store/apps/details?id=com.tdm.manager" target="_blank" class="pdm-btn mx"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>تحميل TDM Player</a>
-<a href="https://play.google.com/store/apps/details?id=org.videolan.vlc" target="_blank" class="pdm-btn vlc"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12.03 2.25a1.5 1.5 0 0 0-1.5 1.5c0 .5.25.94.63 1.22L3.4 19.16a1.5 1.5 0 0 0 1.28 2.25h14.64a1.5 1.5 0 0 0 1.28-2.25L12.9 4.97c.38-.28.63-.72.63-1.22a1.5 1.5 0 0 0-1.5-1.5zM12 8.5l4.75 9.5h-9.5L12 8.5z"/></svg>تحميل VLC (بديل)</a>
+<div class="pdm-title">محتاج تحمّل IPTV Smarters</div>
+<div class="pdm-sub">مفيش مشغل IPTV Smarters مثبت على جهازك<br>حمّله عشان تشغّل القنوات</div>
+<a href="https://play.google.com/store/apps/details?id=com.iptv.smart.smarters.player.stream.tv.live.watch.streaming.chromecast" target="_blank" rel="noopener" class="pdm-btn mx"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>تحميل IPTV Smarters</a>
 <button class="pdm-btn close" onclick="closeDownloadModal()">✕ إغلاق</button>
 <div class="pdm-note">💡 بعد التحميل ارجع للتطبيق واضغط على القناة تاني</div>
 </div>
@@ -612,7 +610,7 @@ showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 2500);
 window.showToast = showToast;
 
 /* ═══════════════════════════════════════
-   🔐 ACTIVATION SYSTEM (FIXED)
+   🔐 ACTIVATION SYSTEM
 ═══════════════════════════════════════ */
 var ACTIVATION_KEY = 'titango_activation_code';
 var currentAppCode = '';
@@ -995,28 +993,39 @@ openPlayerWithUrl(ch.url, ch.name);
 }
 
 /* ═══════════════════════════════════════
-   🎬 PLAYER OPEN LOGIC (TDM Player)
-   - Tries to open with TDM Player
-   - If not installed → shows download modal for TDM
+   🎬 PLAYER OPEN LOGIC (IPTV Smarters Only)
+   - Tries to launch IPTV Smarters directly
+   - If not installed → shows download modal immediately
 ═══════════════════════════════════════ */
-function openPlayerWithUrl(url, name){
-  showToast('جاري فتح TDM Player...', 'success');
-  const isHttps = url.toLowerCase().startsWith("https");
-  const scheme = isHttps ? "https" : "http";
-  const urlNoProto = url.replace(/^https?:\/\//i, "");
+var PLAYER_PKG = "com.iptv.smart.smarters.player.stream.tv.live.watch.streaming.chromecast";
 
-  let opened = false;
-  const mark = function(){ opened = true; };
+function openPlayerWithUrl(url, name){
+  showToast('جاري فتح IPTV Smarters...', 'success');
+
+  var isHttps = url.toLowerCase().indexOf("https") === 0;
+  var scheme = isHttps ? "https" : "http";
+  var urlNoProto = url.replace(/^https?:\/\//i, "");
+
+  var opened = false;
+  var mark = function(){ opened = true; };
   document.addEventListener("visibilitychange", mark, { once: true });
   window.addEventListener("pagehide", mark, { once: true });
   window.addEventListener("blur", mark, { once: true });
 
-  // TDM Player intent
-  const intentUrl = "intent://" + urlNoProto + "#Intent;scheme=" + scheme + ";type=video/*;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.tdm.manager;end";
+  // Build intent for IPTV Smarters
+  var intentUrl = "intent://" + urlNoProto +
+    "#Intent;scheme=" + scheme +
+    ";type=video/*;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=" + PLAYER_PKG + ";end";
 
   try { window.location.href = intentUrl; } catch(e) {}
 
-  // If TDM not installed (still visible after 2.5s) → show download modal
+  // Fallback: try scheme URL directly
+  setTimeout(function(){
+    if(opened || document.hidden || document.visibilityState !== "visible") return;
+    try { window.location.href = url; } catch(e) {}
+  }, 800);
+
+  // If player not installed (still visible after 2.5s) → show download modal
   setTimeout(function(){
     if(!opened && !document.hidden && document.visibilityState === "visible"){
       showDownloadModal();
@@ -1062,4 +1071,4 @@ window.openLiveChannel = openLiveChannel;
 </script>
 
 </body>
-</html>
+  </html>
