@@ -190,6 +190,7 @@ body{background:
 .pdm-btn{width:100%;padding:16px 18px;border:0;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:.15s;color:#fff;text-decoration:none;margin-bottom:10px}
 .pdm-btn:active{transform:scale(.97)}
 .pdm-btn.mx{background:linear-gradient(135deg,var(--p1),var(--p2));box-shadow:0 10px 30px var(--glow)}
+.pdm-btn.vlc{background:linear-gradient(135deg,#ff8c1a,#e85d00);box-shadow:0 10px 30px rgba(255,107,0,.4)}
 .pdm-btn.close{background:transparent;color:var(--text-dim);border:1px solid var(--border);font-size:13px;padding:12px;margin-top:6px}
 .pdm-note{color:#7a6a9a;font-size:11px;text-align:center;margin-top:14px;line-height:1.7;font-weight:600}
 
@@ -334,14 +335,12 @@ TITANGO TV © 2025<br>جميع الحقوق محفوظة
 <div class="player-download-modal" id="playerDownloadModal">
 <div class="pdm-panel">
 <div class="pdm-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-<div class="pdm-title">محتاج تحمّل المشغل</div>
-<div class="pdm-sub">عشان تشغّل القنوات، لازم يكون مشغل الفيديو متحمل على جهازك</div>
-<a href="https://play.google.com/store/apps/details?id=info.t4w.vp" target="_blank" rel="noopener" class="pdm-btn mx">
-<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-تحميل المشغل من Google Play
-</a>
+<div class="pdm-title">محتاج تحمّل مشغل</div>
+<div class="pdm-sub">مفيش مشغل فيديو مثبت على جهازك<br>حمّل واحد من دول عشان تشغّل القنوات</div>
+<a href="https://play.google.com/store/apps/details?id=com.mxtech.videoplayer.ad" target="_blank" class="pdm-btn mx"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>تحميل MX Player</a>
+<a href="https://play.google.com/store/apps/details?id=org.videolan.vlc" target="_blank" class="pdm-btn vlc"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12.03 2.25a1.5 1.5 0 0 0-1.5 1.5c0 .5.25.94.63 1.22L3.4 19.16a1.5 1.5 0 0 0 1.28 2.25h14.64a1.5 1.5 0 0 0 1.28-2.25L12.9 4.97c.38-.28.63-.72.63-1.22a1.5 1.5 0 0 0-1.5-1.5zM12 8.5l4.75 9.5h-9.5L12 8.5z"/></svg>تحميل VLC</a>
 <button class="pdm-btn close" onclick="closeDownloadModal()">✕ إغلاق</button>
-<div class="pdm-note">💡 بعد التحميل، ارجع للتطبيق واضغط على القناة تاني</div>
+<div class="pdm-note">💡 بعد التحميل ارجع للتطبيق واضغط على القناة تاني</div>
 </div>
 </div>
 
@@ -509,6 +508,7 @@ if(s) s.classList.add('show');
 var a = document.getElementById('app'); if(a) a.style.display = 'none';
 var sp = document.getElementById('splash'); if(sp) sp.style.display = 'none';
 var bn = document.getElementById('bottomNav'); if(bn) bn.style.display = 'none';
+var dm = document.getElementById('playerDownloadModal'); if(dm) dm.classList.remove('show');
 window.categoriesData = [];
 if(window.fdb){
 try{ if(window.categoriesRef) window.categoriesRef.off(); }catch(e){}
@@ -611,7 +611,7 @@ showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, 2500);
 window.showToast = showToast;
 
 /* ═══════════════════════════════════════
-   🔐 ACTIVATION SYSTEM
+   🔐 ACTIVATION SYSTEM (FIXED)
 ═══════════════════════════════════════ */
 var ACTIVATION_KEY = 'titango_activation_code';
 var currentAppCode = '';
@@ -992,38 +992,21 @@ if(!ch.live){ showToast('القناة غير متاحة حالياً'); return; 
 if(!ch.url){ showToast('لا يوجد رابط للبث'); return; }
 openPlayerWithUrl(ch.url, ch.name);
 }
-
-/* ═══════════════════════════════════════
-   🎬 PLAYER OPEN LOGIC (info.t4w.vp Scheme)
-═══════════════════════════════════════ */
-var TARGET_PLAYER_PKG = "info.t4w.vp";
-
 function openPlayerWithUrl(url, name){
-  showToast('جاري فتح المشغل...', 'success');
-
-  var opened = false;
-  var mark = function(){ opened = true; };
-  document.addEventListener("visibilitychange", mark, { once: true });
-  window.addEventListener("blur", mark, { once: true });
-
-  // التطبيق بيستقبل الرابط عن طريق scheme اسمه urlplayer
-  var encodedUrl = encodeURIComponent(url);
-  
-  // بناء الـ Intent بالطريقة اللي التطبيق بيفهمها
-  var intentUrl = "intent://" + encodedUrl + "#Intent;scheme=urlplayer;package=" + TARGET_PLAYER_PKG + ";action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end";
-
-  try { 
-    window.location.href = intentUrl; 
-  } catch(e) {}
-
-  // لو التطبيق مش متحمل أو حصل خطأ، نظهر شاشة التحميل
-  setTimeout(function(){
-    if(!opened && !document.hidden && document.visibilityState === "visible"){
-      showDownloadModal();
-    }
-  }, 3000);
+showToast('جاري فتح المشغل...', 'success');
+const isHttps = url.toLowerCase().startsWith("https");
+const scheme = isHttps ? "https" : "http";
+const urlNoProto = url.replace(/^https?:\/\//i, "");
+let opened = false;
+const mark = function(){ opened = true; };
+document.addEventListener("visibilitychange", mark, { once: true });
+window.addEventListener("pagehide", mark, { once: true });
+window.addEventListener("blur", mark, { once: true });
+const intentUrl = "intent://" + urlNoProto + "#Intent;scheme=" + scheme + ";type=video/*;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.mxtech.videoplayer.ad;end";
+try{ window.location.href = intentUrl; }catch(e){}
+setTimeout(function(){ if(!opened && !document.hidden && document.visibilityState === "visible"){ try{ window.open(url, "_blank"); }catch(e){} } }, 1500);
+setTimeout(function(){ if(!opened && !document.hidden && document.visibilityState === "visible"){ showDownloadModal(); } }, 3500);
 }
-
 function showDownloadModal(){ downloadModal.classList.add('show'); }
 function closeDownloadModal(){ downloadModal.classList.remove('show'); }
 window.closeDownloadModal = closeDownloadModal;
